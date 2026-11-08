@@ -12,15 +12,15 @@
 - [诊断码](https://github.com/types-lua/TypeLua/blob/main/internal/diag/codes.go)：稳定的 `TLxxxx` 注册表
 - [AGENTS.md](https://github.com/types-lua/TypeLua/blob/main/AGENTS.md)：编译器仓库的 Agent 启动页
 
-## 指南
+## 指南（站点：https://types-lua.github.io/docs/）
 
-- [总览](/zh/00-index)：是什么、为什么、文档地图
-- [快速开始](/zh/01-quickstart)：5 分钟 init/check/build/run
-- [语言参考](/zh/02-language)：类型、声明、窄化、类、泛型
-- [命令行与工具](/zh/03-cli)：tlua.json、`--format=json`、包管理、LSP
-- [并发](/zh/04-concurrency)：defer、协程、async/spawn/chan/select
-- [FFI 与原生](/zh/05-ffi)：ffi、bindgen、shim、.d.tl、资产透传
-- [模式与排错](/zh/06-patterns)：实战模式 + TL 排错表
+- [总览](https://types-lua.github.io/docs/zh/00-index)：是什么、为什么、文档地图
+- [快速开始](https://types-lua.github.io/docs/zh/01-quickstart)：5 分钟 init/check/build/run
+- [语言参考](https://types-lua.github.io/docs/zh/02-language)：类型、声明、窄化、类、泛型
+- [命令行与工具](https://types-lua.github.io/docs/zh/03-cli)：tlua.json、`--format=json`、包管理、LSP
+- [并发](https://types-lua.github.io/docs/zh/04-concurrency)：defer、协程、async/spawn/chan/select
+- [FFI 与原生](https://types-lua.github.io/docs/zh/05-ffi)：ffi、bindgen、shim、.d.tl、资产透传
+- [模式与排错](https://types-lua.github.io/docs/zh/06-patterns)：实战模式 + TL 排错表
 
 ## 快速开始
 
@@ -64,7 +64,7 @@ print(dist(p, { x = 4, y = 6 }))
 }
 ```
 
-完整中文单文件：`/llms-full-zh.txt`。英文：`/llms.txt`（简明）、`/llms-full.txt`（完整）。
+完整中文单文件：`https://types-lua.github.io/docs/llms-full-zh.txt`。英文：`https://types-lua.github.io/docs/llms.txt`（简明）、`https://types-lua.github.io/docs/llms-full.txt`（完整）。
 
 ---
 

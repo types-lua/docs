@@ -12,15 +12,15 @@
 - [Diagnostics](https://github.com/types-lua/TypeLua/blob/main/internal/diag/codes.go): stable `TLxxxx` registry
 - [AGENTS.md](https://github.com/types-lua/TypeLua/blob/main/AGENTS.md): agent bootstrap for the compiler repo
 
-## Guide
+## Guide (site: https://types-lua.github.io/docs/)
 
-- [Index](/en/00-index): what/why, doc map
-- [Quickstart](/en/01-quickstart): init/check/build/run in 5 minutes
-- [Language](/en/02-language): types, declarations, narrowing, classes, generics
-- [CLI & Tooling](/en/03-cli): tlua.json, `--format=json`, packages, LSP
-- [Concurrency](/en/04-concurrency): defer, coroutines, async/spawn/chan/select
-- [FFI & Native](/en/05-ffi): ffi, bindgen, shims, .d.tl, assets
-- [Patterns & Fixes](/en/06-patterns): recipes + TL error-fix table
+- [Index](https://types-lua.github.io/docs/en/00-index): what/why, doc map
+- [Quickstart](https://types-lua.github.io/docs/en/01-quickstart): init/check/build/run in 5 minutes
+- [Language](https://types-lua.github.io/docs/en/02-language): types, declarations, narrowing, classes, generics
+- [CLI & Tooling](https://types-lua.github.io/docs/en/03-cli): tlua.json, `--format=json`, packages, LSP
+- [Concurrency](https://types-lua.github.io/docs/en/04-concurrency): defer, coroutines, async/spawn/chan/select
+- [FFI & Native](https://types-lua.github.io/docs/en/05-ffi): ffi, bindgen, shims, .d.tl, assets
+- [Patterns & Fixes](https://types-lua.github.io/docs/en/06-patterns): recipes + TL error-fix table
 
 ## Quickstart
 
@@ -64,7 +64,7 @@ print(dist(p, { x = 4, y = 6 }))
 }
 ```
 
-Full reference: `/llms-full.txt`. Chinese: `/llms-zh.txt` (concise), `/llms-full-zh.txt` (full).
+Full reference: `https://types-lua.github.io/docs/llms-full.txt`. Chinese: `https://types-lua.github.io/docs/llms-zh.txt` (concise), `https://types-lua.github.io/docs/llms-full-zh.txt` (full).
 
 ---
 

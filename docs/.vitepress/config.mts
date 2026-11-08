@@ -24,6 +24,8 @@ export default defineConfig({
   title: 'TypeLua',
   description: 'TypeLua — typed superset of Lua (EN/ZH docs + llms.txt)',
   lang: 'en-US',
+  // Org site serves this repo at https://types-lua.github.io/docs/.
+  base: '/docs/',
   lastUpdated: true,
   cleanUrls: true,
   ignoreDeadLinks: false,
