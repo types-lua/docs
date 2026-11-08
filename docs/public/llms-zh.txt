@@ -1,0 +1,63 @@
+# TypeLua（中文）
+
+> TypeLua 是带可擦除静态类型的 Lua（TypeScript-for-Lua）。默认产物为地道 Lua 5.4，兼容 5.1/LuaJIT。只有 `class`/`enum` 会产生运行时值。
+
+- [文档仓库](https://github.com/types-lua/docs)：中英双语指南 + 完整参考
+- [SPEC v0.8](https://github.com/types-lua/TypeLua/blob/main/SPEC.md)：语言契约（§§1–16，以此为准）
+- [示例](https://github.com/types-lua/TypeLua/tree/main/examples)：25 个可运行程序，全部 `tlua check` 通过
+- [诊断码](https://github.com/types-lua/TypeLua/blob/main/internal/diag/codes.go)：稳定的 `TLxxxx` 注册表
+- [AGENTS.md](https://github.com/types-lua/TypeLua/blob/main/AGENTS.md)：编译器仓库的 Agent 启动页
+
+## 指南
+
+- [总览](/zh/00-index)：是什么、为什么、文档地图
+- [快速开始](/zh/01-quickstart)：5 分钟 init/check/build/run
+- [语言参考](/zh/02-language)：类型、声明、窄化、类、泛型
+- [命令行与工具](/zh/03-cli)：tlua.json、`--format=json`、包管理、LSP
+- [并发](/zh/04-concurrency)：defer、协程、async/spawn/chan/select
+- [FFI 与原生](/zh/05-ffi)：ffi、bindgen、shim、.d.tl、资产透传
+- [模式与排错](/zh/06-patterns)：实战模式 + TL 排错表
+
+## 快速开始
+
+```bash
+go build -o tlua ./cmd/tlua
+./tlua init
+./tlua check --format=json
+./tlua build
+./tlua run --check main.tl
+```
+
+```lua
+type Point = { x: number, y: number }
+local function dist(a: Point, b: Point): number
+  local dx: number = a.x - b.x
+  local dy: number = a.y - b.y
+  return dx * dx + dy * dy
+end
+local p: Point = { x = 1, y = 2 }
+print(dist(p, { x = 4, y = 6 }))
+```
+
+## 规则速记
+
+- 合法 Lua 5.4 即合法 TypeLua；`type`/`class`/`import`/`defer`/`await`/`spawn`/`select`/`async`/`macro` 均为上下文关键字。
+- `strictNilChecks` 默认开：用 `==nil`/`~=nil`、`type(x)==`、`=="lit"`、真值、成员路径窄化。
+- `interface` 结构兼容，类实例名义兼容；`super(...)` 只在派生构造器且在 `self` 之前。
+- `import N from "p"` 是带类型推断的 `require` 糖；`require("ffi")` 仅在 `require` 未被遮蔽时有精确类型。
+- `defer f()` 只接受调用，函数退出 LIFO 运行；`errdefer` 仅在同一函数显式 `error()` 时触发。
+- 并发是单线程 CSP：`await`/`select` 在 `async` 外报错（`TL3801`/`TL3802`）；同步调用阻塞原语报 `TL3805`。
+- FFI/`.so` 需 `--target 5.1` + `--lua luajit`；`ffi.cdef` 不透明，手写 `as CLib`；`.d.tl` 只检查不发射。
+- JSON 诊断：`{file,line,column,endLine,endColumn,severity,code,category,message}`；`code` 稳定。
+
+## tlua.json
+
+```json
+{
+  "compilerOptions": { "target": "5.4", "strict": true, "outDir": "dist", "rootDir": "." },
+  "include": ["**/*.tl"],
+  "exclude": ["dist"]
+}
+```
+
+完整中文单文件：`/llms-full-zh.txt`。英文：`/llms.txt`（简明）、`/llms-full.txt`（完整）。

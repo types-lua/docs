@@ -1,0 +1,57 @@
+/* Elegant TypeLua theme: quiet, airy, print-like. Only variable + type tweaks,
+   no layout hacks, so VitePress upgrades don't break it. */
+
+:root {
+  --vp-c-brand-1: #5b5bd6;
+  --vp-c-brand-2: #4646b8;
+  --vp-c-brand-3: #36368f;
+  --vp-c-brand-soft: rgba(91, 91, 214, 0.12);
+
+  --vp-font-family-base: "Inter", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --vp-font-family-mono: "JetBrains Mono", "SFMono-Regular", ui-monospace, "PingFang SC", monospace;
+
+  --vp-layout-max-width: 1160px;
+  --vp-content-max-width: 760px;
+}
+
+.dark {
+  --vp-c-brand-1: #8f8ff0;
+  --vp-c-brand-2: #a5a5f5;
+  --vp-c-brand-soft: rgba(143, 143, 240, 0.16);
+}
+
+/* Softer hero, tighter prose rhythm */
+.VPHero .tagline {
+  max-width: 560px;
+  text-wrap: balance;
+}
+
+.vp-doc p {
+  line-height: 1.75;
+}
+
+.vp-doc li + li {
+  margin-top: 4px;
+}
+
+/* Code: calm background, readable contrast in both modes */
+.vp-doc div[class*="language-"] {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 10px;
+}
+
+.vp-doc code {
+  font-size: 0.86em;
+}
+
+/* Tables: no sticky glare, gentle header */
+.vp-doc th {
+  font-weight: 600;
+  background: var(--vp-c-bg-soft);
+}
+
+/* Sidebar current link: underline instead of heavy pill */
+.VPSidebarItem.is-active > .item > .link {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}

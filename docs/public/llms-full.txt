@@ -1,0 +1,830 @@
+# TypeLua — full reference (EN, self-contained)
+
+> Generated from docs/en/*.md. Every ```lua block passes `tlua check`.
+
+# TypeLua
+
+> TypeLua is a typed superset of Lua (TypeScript-for-Lua). Types erase to idiomatic Lua (5.4 default, 5.1/LuaJIT compatible). Only `class`/`enum` emit runtime values.
+
+- [Docs home](https://github.com/types-lua/docs): bilingual guides (EN/ZH) + full references
+- [SPEC v0.8](https://github.com/types-lua/TypeLua/blob/main/SPEC.md): normative language contract, §§1–16
+- [Examples](https://github.com/types-lua/TypeLua/tree/main/examples): 25 runnable `tlua check`-clean programs
+- [Diagnostics](https://github.com/types-lua/TypeLua/blob/main/internal/diag/codes.go): stable `TLxxxx` registry
+- [AGENTS.md](https://github.com/types-lua/TypeLua/blob/main/AGENTS.md): agent bootstrap for the compiler repo
+
+## Guide
+
+- [Index](/en/00-index): what/why, doc map
+- [Quickstart](/en/01-quickstart): init/check/build/run in 5 minutes
+- [Language](/en/02-language): types, declarations, narrowing, classes, generics
+- [CLI & Tooling](/en/03-cli): tlua.json, `--format=json`, packages, LSP
+- [Concurrency](/en/04-concurrency): defer, coroutines, async/spawn/chan/select
+- [FFI & Native](/en/05-ffi): ffi, bindgen, shims, .d.tl, assets
+- [Patterns & Fixes](/en/06-patterns): recipes + TL error-fix table
+
+## Quickstart
+
+```bash
+go build -o tlua ./cmd/tlua
+./tlua init
+./tlua check --format=json
+./tlua build
+./tlua run --check main.tl
+```
+
+```lua
+type Point = { x: number, y: number }
+local function dist(a: Point, b: Point): number
+  local dx: number = a.x - b.x
+  local dy: number = a.y - b.y
+  return dx * dx + dy * dy
+end
+local p: Point = { x = 1, y = 2 }
+print(dist(p, { x = 4, y = 6 }))
+```
+
+## Rules
+
+- Valid Lua 5.4 is valid TypeLua; `type`/`class`/`import`/`defer`/`await`/`spawn`/`select`/`async`/`macro` are contextual.
+- `strictNilChecks` is on: narrow with `==nil`/`~=nil`, `type(x)==`, `=="lit"`, truthiness, member paths.
+- `interface` is structural, `class` instances are nominal; `super(...)` only in derived constructors before `self`.
+- `import N from "p"` is typed `require` sugar; `require("ffi")` is typed only when `require` is not shadowed.
+- `defer f()` takes a call, LIFO at function exit; `errdefer` only on explicit `error()` in the same function.
+- Concurrency is single-threaded CSP: `await`/`select` outside `async` is `TL3801`/`TL3802`; sync callers cannot call blocking primitives (`TL3805`).
+- FFI/`.so` needs `--target 5.1` + `--lua luajit`; `ffi.cdef` is opaque, hand-write `as CLib`; `.d.tl` checks but never emits.
+- JSON diags: `{file,line,column,endLine,endColumn,severity,code,category,message}`; `code` is stable.
+
+## tlua.json
+
+```json
+{
+  "compilerOptions": { "target": "5.4", "strict": true, "outDir": "dist", "rootDir": "." },
+  "include": ["**/*.tl"],
+  "exclude": ["dist"]
+}
+```
+
+Full reference: `/llms-full.txt`. Chinese: `/llms-zh.txt` (concise), `/llms-full-zh.txt` (full).
+
+---
+
+
+<!-- docs/en/00-index.md -->
+
+# TypeLua — English index
+
+> TypeLua is Lua with erasable static types (TypeScript-for-Lua). Default target Lua 5.4, compatible with 5.1/LuaJIT. `class`/`enum` are the only type-level constructs with runtime values.
+
+## Reading order
+
+1. `en/00-index.md` — what/why, doc map (read first)
+2. `en/01-quickstart.md` — init/check/build/run in 5 minutes
+3. `en/02-language.md` — types, declarations, narrowing, classes, generics
+4. `en/03-cli.md` — `tlua.json`, CLI flags, `--format=json`, LSP, diagnostics
+5. `en/04-concurrency.md` — `defer`, coroutines, `async`/`await`/`spawn`/`chan`/`select`
+6. `en/05-ffi.md` — FFI, `bindgen`, cross-language shims, `.d.tl`, packaging
+7. `en/06-patterns.md` — agent recipes + error-fix table
+
+## Minimal program (verified)
+
+```lua
+type Point = { x: number, y: number }
+local function dist(a: Point, b: Point): number
+  local dx: number = a.x - b.x
+  local dy: number = a.y - b.y
+  return dx * dx + dy * dy
+end
+local p: Point = { x = 1, y = 2 }
+print(dist(p, { x = 4, y = 6 }))
+```
+
+## tlua.json (sane default)
+
+```json
+{
+  "compilerOptions": { "target": "5.4", "strict": true, "outDir": "dist", "rootDir": "." },
+  "include": ["**/*.tl"],
+  "exclude": ["dist"]
+}
+```
+
+## Agent commands
+
+```bash
+go build -o tlua ./cmd/tlua
+./tlua check --format=json
+./tlua build
+./tlua run --check main.tl
+```
+
+Full reference: `llms-full.txt`. Chinese: `llms-zh.txt` / `llms-full-zh.txt`.
+Contract: `https://github.com/types-lua/TypeLua/blob/main/SPEC.md`.
+Runnable idioms: `https://github.com/types-lua/TypeLua/tree/main/examples`.
+
+
+<!-- docs/en/01-quickstart.md -->
+
+# Quickstart (EN)
+
+## 1. Install and scaffold
+
+```bash
+go build -o tlua ./cmd/tlua
+./tlua init
+./tlua check
+./tlua build   # -> dist/*.lua
+./tlua run main.tl -- arg1 arg2
+```
+
+`./tlua init` writes `tlua.json` plus a hello `main.tl` when missing.
+`./tlua check` prints `checked N file(s): no errors` and exits 1 on error.
+`./tlua build --watch` (or `./tlua watch`) recompiles on change like `tsc --watch`.
+
+## 2. Your first typed program
+
+```lua
+type Point = { x: number, y: number }
+local function dist(a: Point, b: Point): number
+  local dx: number = a.x - b.x
+  local dy: number = a.y - b.y
+  return dx * dx + dy * dy
+end
+local p: Point = { x = 1, y = 2 }
+print(dist(p, { x = 4, y = 6 }))
+```
+
+Run it without leaving artifacts:
+
+```bash
+./tlua run --check main.tl
+```
+
+Expected output is `25`.
+
+## 3. Target 5.4 vs 5.1
+
+Default `target` is `5.4`. Use `5.1` for LuaJIT:
+
+```json
+{
+  "compilerOptions": { "target": "5.1", "strict": true, "outDir": "dist", "rootDir": "." },
+  "include": ["**/*.tl"],
+  "exclude": ["dist"]
+}
+```
+
+`--target 5.1` strips `<const>`/`<close>` and hides
+`coroutine.close`/`coroutine.isyieldable`. FFI and `.so` modules always need
+`--target 5.1` plus an external interpreter:
+
+```bash
+./tlua build --target 5.1
+./tlua run --target 5.1 --lua luajit main.tl
+```
+
+The embedded `run` (golua) cannot load C modules by design.
+
+## 4. Nil safety from the start
+
+```lua
+local function greet(name: string | nil): string
+  if name == nil then
+    return "hello, stranger"
+  end
+  return "hello, " .. name
+end
+print(greet(nil))
+print(greet("ada"))
+```
+
+`strictNilChecks` is on by default: `nil` is not assignable to `string`.
+Narrow with `==nil`/`~=nil`, `type(x)`, `=="lit"`, truthiness, or member paths:
+
+```lua
+type Node = { v: number, next: Node | nil }
+local function head(n: Node | nil): number
+  if n == nil then
+    return 0
+  end
+  if n.next then
+    return n.next.v
+  end
+  return n.v
+end
+print(head(nil))
+print(head({ v = 7, next = { v = 8, next = nil } }))
+```
+
+## 5. Next steps
+
+- Language details: `en/02-language.md`
+- CLI + JSON diags + LSP: `en/03-cli.md`
+- If `tlua check` fails, read the `TLxxxx` code in the fix table (`en/06-patterns.md`).
+
+
+<!-- docs/en/02-language.md -->
+
+# Language reference (EN)
+
+Covers SPEC §§2–6 + §8 essentials. Every snippet checks clean.
+
+## Types
+
+```lua
+local a: any = 1
+local u: unknown = "s"
+local n: number = 1.5
+local i: integer = 3
+local f: float = 1.5
+local s: string = "hi"
+local b: boolean = true
+local t: table = {}
+local lit: "red" = "red"
+local num: 42 = 42
+local arr: number[] = { 1, 2, 3 }
+local m: map<string, number> = { alice = 3 }
+local tup: [string, number] = { "age", 30 }
+local uni: number | nil = nil
+type Both = { a: number } & { b: string }
+local inter: Both = { a = 1, b = "x" }
+local opt: string? = nil
+print(a, u, n, i, f, s, b, #arr, m.alice, tup[1], uni, inter, opt)
+```
+
+`integer`/`float` are subtypes of `number`. `T?` means `T | nil`.
+`map<K, V>` field access requires `K` to accept `string` for dot access.
+`keyof`/`typeof`/indexed access/conditionals are in Advanced below.
+
+## Type aliases, interfaces, enums
+
+```lua
+type Point = { x: number, y: number }
+type List<T> = { head: T, tail: List<T> | nil }
+interface Named { name: string, greet(msg: string): string }
+interface Employee extends Named { id: integer }
+enum Color { Red = "red", Green = "green", Blue = "blue" }
+enum N { A, B = 5, C }
+local p: Point = { x = 1, y = 2 }
+local c: Color = Color.Red
+local e: Employee = {
+  name = "bo",
+  id = 7,
+  greet = function(msg: string): string return msg .. "bo" end,
+}
+print(p.x, c, e.id, N.C)
+```
+
+Mixed string enums need explicit values on every member after the first
+(`TL3120` otherwise). `interface` is structural; class instances are nominal.
+
+## Functions (both type syntaxes work)
+
+```lua
+local function add(a: number, b: number): number return a + b end
+local function divmod(a: number, b: number): (number, number) return a / b, a % b end
+local function cat(...nums: number[]): string
+  local out: string = ""
+  for _, v in ipairs(nums) do out = out .. tostring(v) end
+  return out
+end
+local q: number
+local r: number
+q, r = divmod(7, 2)
+print(add(2, 3), q, r, cat(1, 2, 3))
+```
+
+Multi-return is `-> (A, B)`; only the last call in an argument list expands.
+Generic functions infer, or take explicit arguments:
+
+```lua
+local function id<T>(v: T): T return v end
+local function first<T>(xs: T[]): T | nil
+  if #xs == 0 then return nil end
+  return xs[1]
+end
+print(id<string>("hi"), id<number>(7), first<string>({ "a", "b" }))
+print(first<number>({}))
+```
+
+Explicit args also work on methods and constructors: `obj:m<T>()`, `C.new<T>()`.
+
+## Narrowing (nil-safe Lua)
+
+```lua
+local function use(x: number | string | nil): string
+  if x == nil then
+    return "none"
+  end
+  if type(x) == "string" then
+    return "str:" .. x
+  end
+  return "num:" .. tostring(x + 1)
+end
+print(use(nil))
+print(use("hi"))
+print(use(41))
+```
+
+Truthiness also narrows (`if x then` drops `nil`/`false`), and member paths
+narrow without a temporary:
+
+```lua
+type Node = { v: number, next: Node | nil }
+local function second(n: Node): number
+  if n.next then
+    return n.next.v
+  end
+  return n.v
+end
+print(second({ v = 1, next = { v = 2, next = nil } }))
+```
+
+`x as T` passes when either direction is assignable; `x!` strips `nil`;
+`!=` is `~=` and always emits as `~=`.
+
+## Classes (nominal, block-scoped)
+
+```lua
+abstract class Animal {
+  name: string,
+  constructor(name: string) self.name = name end,
+  abstract speak(): string,
+  describe(): string return "i am " .. self.name end,
+}
+class Dog extends Animal {
+  tricks: string[] = {},
+  static count: integer = 0,
+  constructor(name: string) super(name) end,
+  speak(): string return "woof" end,
+}
+local d = Dog.new("rex")
+print(d:describe(), d:speak())
+```
+
+Rules: single `extends` + multiple `implements`; subclass instances assign to
+base, unrelated classes never mix; `private`/`protected`/`readonly`/`static`/
+`abstract` are compile-time; `super(...)` only in derived constructors before
+`self`, `super:m(...)` for base methods; abstract classes cannot be
+instantiated. Declare-only classes (`declare class`) emit nothing.
+
+## Advanced types (conditional / keyof / indexed / mapped)
+
+```lua
+type IsString<T> = T extends string ? true : false
+type Head<T> = T extends [infer H, ...unknown[]] ? H : never
+type NameOf<T> = keyof T
+local a: IsString<string> = true
+local h: Head<[string, number]> = "first"
+type P = { x: number, y?: string, readonly z: boolean }
+local k: NameOf<P> = "x"
+local px: P[string] = 1
+type RO<T> = { readonly [K in keyof T]: T[K] }
+print(a, h, k, px)
+```
+
+`infer` only appears inside an `extends` clause. Bare type parameters
+distribute over unions. Indexed access requires every key to exist
+(`TL3603`). `keyof` mappings inherit optionality/readonly unless `-?`/
+`-readonly` forces the opposite. Recursive aliases must go through an object
+(`type A = A` is `TL3106`).
+
+## Imports are typed requires
+
+```lua
+-- math_utils.tl
+local M: { double(n: number): number } = {
+  double = function(n: number): number return n * 2 end,
+}
+return M
+```
+
+```lua
+-- main.tl
+import U from "math_utils"
+print(U.double(21))
+```
+
+The checker infers the module type from `return M`; annotate the boundary
+(`import U: T from "p"` or `require(...) as T`) to freeze it. Mismatches are
+`TL3010`. Missing/circular/self imports degrade to `any`, never to a crash.
+
+## Macros are hygienic
+
+```lua
+macro twice(x) = (x) + (x)
+macro unless(cond, body) do
+  if not (cond) then
+    body
+  end
+end
+local v: number = twice(20) + 1
+unless(v == 0, print("nonzero"))
+print(v)
+```
+
+Expression macros use `=`, statement macros use `do ... end`. Parameters are
+renamed per expansion (hygiene); statement macros in expression position are
+`TL3704`; arity must match (`TL3702`); trailing `...` must be last and only
+splices into call args (`TL3706`).
+
+
+<!-- docs/en/03-cli.md -->
+
+# CLI & Tooling (EN)
+
+## tlua.json
+
+```json
+{
+  "compilerOptions": {
+    "target": "5.4",
+    "strict": true,
+    "strictNilChecks": true,
+    "noImplicitAny": false,
+    "outDir": "dist",
+    "rootDir": ".",
+    "sourceMap": false,
+    "treeShake": false,
+    "types": [],
+    "typeRoots": ["types", "tlua_modules/@types"]
+  },
+  "include": ["**/*.tl"],
+  "exclude": ["dist"]
+}
+```
+
+`types: []` means all ambient `.d.tl` files (mirrors `tsconfig.types`).
+`typeRoots` defaults are `types` + `tlua_modules/@types`; missing dirs are ignored.
+`.d.tl` files check but never emit.
+
+## Commands
+
+```bash
+./tlua init
+./tlua check
+./tlua check --format=json
+./tlua build --target 5.1 --treeShake
+./tlua build --format=json
+./tlua run main.tl -- arg1 arg2
+./tlua run --check --format=json main.tl
+./tlua run --lua luajit --target 5.1 main.tl
+./tlua watch
+./tlua bindgen --header foo.h --out types/foo.d.tl --shim foo.tl
+./tlua lsp
+```
+
+`check`/`build`/`run --check` accept `--format=text|json` (default `text`,
+exit code unchanged). `watch` stays text (streaming logs). `--target` only
+accepts `5.4`/`5.1`. `build` with no `.tl` files is `no .tl files found`.
+
+## JSON diagnostics (for agents)
+
+```bash
+./tlua check --format=json
+```
+
+```json
+[
+  {
+    "file": "bad.tl",
+    "line": 1,
+    "column": 7,
+    "endLine": 1,
+    "endColumn": 8,
+    "severity": "error",
+    "code": "TL3010",
+    "category": "checker",
+    "message": "type '\"oops\"' is not assignable to type 'number'"
+  }
+]
+```
+
+Keys are stable and sorted by file/line/column. `code` ranges:
+`TL1xxx` lexer, `TL2xxx` parser, `TL3xxx` checker, `TL37xx` macros,
+`TL38xx` concurrency, `TL4xxx` project. `category` derives from the code.
+
+## Packages
+
+```bash
+./tlua mod init
+./tlua mod get example.com/greet@v1.2.0
+./tlua mod fetch
+./tlua mod vendor
+./tlua mod list
+./tlua mod graph
+```
+
+Modules are git repos addressed by path (`github.com/owner/repo[/sub]`),
+pinned in `tlua.toml`/`tlua.lock` (MVS, `exact` pins, `replace` for local
+paths). `vendor` copies `*.tl` into `tlua_modules/<path>/`; builds emit
+`tlua_modules/**/*.tl` to `dist/tlua_modules/...` and inject a bootstrap
+prelude so `lua dist/main.lua` runs without `LUA_PATH` setup.
+
+A typed dependency boundary looks like this:
+
+```lua
+-- math_utils.tl
+local M: { double(n: number): number } = {
+  double = function(n: number): number return n * 2 end,
+}
+return M
+```
+
+```lua
+-- main.tl
+import U from "math_utils"
+print(U.double(21))
+```
+
+## LSP (stdio)
+
+```bash
+./tlua lsp
+```
+
+Incremental sync (`textDocumentSync: 2`), hover, definition, completion on
+`.`/`:` (members included), references, rename, document symbols. Diagnostics
+push as `textDocument/publishDiagnostics` with `{range, severity, code,
+source: "tlua", message}`. Single-file mode has no ambient context — for
+multi-file projects, trust `tlua check`, not single-file hover.
+
+## sourceMap and treeShake
+
+```bash
+./tlua build --sourceMap
+./tlua build --treeShake
+```
+
+`--sourceMap` writes `<out>.lua.map` (V3 + `sourcesContent`) plus a
+`--# sourceMappingURL=` footer. `--treeShake` drops zero-reference pure local
+functions (`local function f` / single `local x = function`, transitive).
+Globals, methods, table fields, `require`/`import`, `return`-reachable and
+multi-value/attributed locals are never removed. Unknown AST nodes disable
+shaking for that file (fail-safe).
+
+
+<!-- docs/en/04-concurrency.md -->
+
+# Concurrency (EN)
+
+Single-threaded CSP on coroutines: no true parallelism. `async`/`await` are
+explicit markers that erase to plain calls.
+
+## defer / errdefer (LIFO cleanup)
+
+```lua
+local function read(name: string): number
+  local log: { close(): void } = {
+    close = function(): void print("close", name) end,
+  }
+  local function closeLog(): void log.close() end
+  defer closeLog()
+  if name == "" then
+    return 0
+  end
+  return 1
+end
+print(read("a"))
+print(read(""))
+```
+
+`defer f()` / `errdefer f()` take a call, run LIFO at function exit, and
+capture lazily (Lua closure rules). `errdefer` runs only when the same
+function leaves via an explicit `error(...)`. Never pass bare `...`
+(`TL3235`).
+
+## Coroutines (typed)
+
+```lua
+local co: thread = coroutine.create(function()
+  coroutine.yield("step")
+end)
+local ok: boolean
+local v: any
+ok, v = coroutine.resume(co)
+print(ok, v)
+print(coroutine.status(co))
+```
+
+`create` requires a function (`TL3233`); `resume` returns `(boolean, any)`;
+`running()` returns `(thread, boolean | nil)`; `close`/`isyieldable` exist
+only on 5.4 (`TL3203` on 5.1). Literal `status(co) == "dead"` narrows.
+
+## async / await + spawn + chan + select
+
+```lua
+local jobs: chan<integer> = makeChan<integer>(4)
+local done: chan<boolean> = makeChan<boolean>(1)
+
+async function worker(): void
+  while true do
+    local v: integer
+    local ok: boolean
+    v, ok = await jobs:recv()
+    if not ok then
+      await done:send(true)
+      return
+    end
+    print("did", v)
+  end
+end
+
+async function main(): void
+  spawn worker()
+  await jobs:send(1)
+  await jobs:send(2)
+  jobs:close()
+  local d: boolean
+  local ok2: boolean
+  d, ok2 = await done:recv()
+  print("done", d, ok2)
+end
+
+await main()
+```
+
+Rules agents trip on:
+
+- `await`/`select` only inside `async` functions or the top-level chunk
+  (`TL3801`/`TL3802`).
+- Sync functions cannot call `async` functions or blocking primitives
+  (`sleep`/`timeout`, `ch:send`/`ch:recv`, `wg:wait`, `mu:lock`) — `TL3805`.
+  `spawn` is exempt.
+- `chan<T>` is invariant; `makeChan<T>(cap?)` must spell `T` (`TL3803`).
+- `recv()` returns `(T, boolean)` (`ok=false` when closed and drained);
+  `send` on a closed channel errors; `close` twice errors.
+- `select` uses braces with `case` guards and optional trailing `default`:
+
+```lua
+local ch: chan<integer> = makeChan<integer>(1)
+await ch:send(9)
+select {
+  case local v = ch:recv() then
+    print("got", v)
+  case timeout(5.0) then
+    print("timed out")
+  default then
+    print("busy")
+}
+```
+
+Only `recv`/`send`/`timeout`/`sleep` guards are allowed. First ready case in
+source order wins (not random). `break` exits the select; `return`/`defer`
+behave normally. `for v in ch:iter() do` drains until close but cannot wait
+inside `--target 5.1` iterators.
+
+`WaitGroup`/`Mutex` follow Go spelling (`new`/`add`/`done`/`wait`,
+`new`/`lock`/`unlock`/`tryLock`) with `await` on `wait`/`lock`.
+
+
+<!-- docs/en/05-ffi.md -->
+
+# FFI & Native (EN)
+
+FFI needs LuaJIT: `--target 5.1` plus `--lua luajit`. The checker accepts FFI
+types on 5.4 too, so snippets below still `check` clean everywhere.
+
+## Direct FFI (explicit boundary)
+
+```lua
+local ffi = require("ffi")
+ffi.cdef[[
+  int add(int a, int b);
+]]
+type CLib = { add(a: integer, b: integer): integer }
+local C = ffi.load("mylib") as CLib
+local n: number = C.add(20, 22)
+print(n)
+```
+
+- `cdata`/`ctype` never mix with `userdata` (`TL3010`; dubious conversions
+  are `TL3204`).
+- `cdef` strings are opaque and emitted verbatim; the author guarantees the C
+  side. The type boundary is always hand-written `as CLib`.
+- If the local `require` is shadowed, `require("ffi")` degrades to `any`
+  (old code keeps working).
+
+## bindgen (header is the single source)
+
+```bash
+tlua bindgen --header mylib.h --out types/mylib.d.tl --shim mylib.tl --lib MyLib
+```
+
+Generates a `type`/enum/`interface` contract plus an optional typed shim
+(`require ffi` + `cdef` + script-dir `ffi.load` + single `as` + `return`).
+Callers then `import` with zero casts. Point `--so` at the real shared object
+when the filename differs from `lib<base>.so`.
+
+## Cross-language shim (one mouth)
+
+Hide the three shapes (C module / FFI-direct / shim process) behind
+`require` + `.d.tl`:
+
+```lua
+-- native_shim.lua (HOW, plain Lua kept next to the .tl)
+local M = {}
+function M.native_add(a, b) return a + b end
+return M
+```
+
+```lua
+-- native.d.tl (WHAT, checks but never emits)
+declare type NativeLib = { native_add(a: number, b: number): number }
+```
+
+```lua
+-- main.tl (caller only sees require + as; in a real project NativeLib
+-- comes from native.d.tl, here it is spelled locally so the file checks alone)
+type NativeLib = { native_add(a: number, b: number): number }
+local M = require("native_shim") as NativeLib
+print(M.native_add(20, 22))
+```
+
+The recommended shape (`examples/c`) is: `.h` → `bindgen` → `.d.tl` → one
+hand-written TypeLua shim (`cdef` + `ffi.load` + single `as`, ends with
+`return M`) → callers `import C from "mylib"` with no casts.
+
+## Assets and packaging
+
+`build` passes through `*.lua` shims, `*.so`/`*.dylib`/`*.dll`, and `*.a`
+into `dist` (same layout). `mod vendor` copies all four kinds into
+`tlua_modules/<path>/`. `.a` never enters `package.cpath`: link it into the
+host binary and call it via `ffi.C` instead of `ffi.load`. Keep headers and
+docs out of `vendor` (cache only).
+
+Watch tracks `ListNativeAssets` (`.lua`/`.so`/`.a` changes rebuild); `outDir`
+is never watched.
+
+
+<!-- docs/en/06-patterns.md -->
+
+# Patterns & Fixes (EN)
+
+## Wrap legacy Lua with a typed boundary
+
+```lua
+-- legacy.lua returns an untyped table; keep it plain Lua.
+-- legacy.tl (typed facade next to it)
+local raw = require("legacy") as any
+type Legacy = { parse(s: string): number }
+local L = raw as Legacy
+local n: number = L.parse("42")
+print(n)
+```
+
+Prefer `as` at one place and export the `Legacy` type; don't sprinkle `any`.
+
+## Module pattern (inferred, frozen at the edge)
+
+```lua
+-- greet.tl
+local Greet: { hello(name: string): string } = {
+  hello = function(name: string): string return "hi " .. name end,
+}
+return Greet
+```
+
+```lua
+-- main.tl
+import G from "greet"
+print(G.hello("bo"))
+```
+
+If the boundary changes incompatibly, pin it explicitly
+(`import G: Api from "greet"`) to get `TL3010` at the edge instead of
+surprises inside.
+
+## Error-fix table (what agents hit most)
+
+| Code | Meaning | Fix |
+|---|---|---|
+| `TL2015` | Nesting > 256 | Split the expression/type/block; don't hand-nest 200+ deep. |
+| `TL3010` | Not assignable | Add a narrow (`==nil`, `type(x)==`, `as T`) or fix the boundary `as`. |
+| `TL3001` | Duplicate type | Ambient `.d.tl` + local share a name; rename the local. |
+| `TL3103` | Undefined type | Import the file or add the `.d.tl`; check `types` allowlist. |
+| `TL3106` | Recursive/over-deep generic | Route recursion through an object; avoid `L<L<T>>`-style self-feeding. |
+| `TL3201` | Undefined variable | Declare before use; `self` only in methods. |
+| `TL3203` | No such field | Narrow the union first; check `keyof`/optional (`?`). |
+| `TL3232`/`TL3233` | Arity/type mismatch | Count args (methods pass `self`); match `(A, B)` multi-return. |
+| `TL3234` | Bad explicit type args | Fill missing slots left-to-right; respect `extends` constraints. |
+| `TL3310` | Visibility | `private` only inside the class; don't reach through instances for `static`. |
+| `TL3602`/`TL3603` | Bad mapped/indexed access | Map only over literal-union/`keyof`/index-signature domains; ensure keys exist. |
+| `TL37xx` | Macro misuse | Arity exact; statement macro stays in statement position; `...` last and only into call args. |
+| `TL3801`/`TL3802` | `await`/`select` outside async | Mark the function `async` or move to the chunk top level. |
+| `TL3805` | Sync calls async/blocking | `spawn` it, or make the caller `async` and `await` it. |
+| `TL4001` | Cannot read file | Fix `include`/`exclude`/`rootDir`; `outDir` is never an input. |
+
+## 5.1 checklist
+
+- No `<const>`/`<close>`, no `//`, no bitwise ops, no `goto` into new scoping.
+- `coroutine.close`/`isyieldable` don't exist (`TL3203`).
+- `yield` cannot cross `pcall` or for-iterators; move the suspension out.
+- FFI/`.so` runs need `--lua luajit`, never embedded `run`.
+
+## Agent workflow (cheap → expensive)
+
+1. `./tlua check --format=json` — fix `error` entries only (`warning` never fails the build).
+2. Re-run the one failing file with `tlua run --check` for a fast repro.
+3. For multi-file inference questions, read `SPEC.md` §3/§11, not LSP hover alone.
+4. Keep new snippets minimal, then run `scripts/check_snippets.py` before pushing docs.
+

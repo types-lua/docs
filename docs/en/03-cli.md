@@ -1,0 +1,131 @@
+# CLI & Tooling (EN)
+
+## tlua.json
+
+```json
+{
+  "compilerOptions": {
+    "target": "5.4",
+    "strict": true,
+    "strictNilChecks": true,
+    "noImplicitAny": false,
+    "outDir": "dist",
+    "rootDir": ".",
+    "sourceMap": false,
+    "treeShake": false,
+    "types": [],
+    "typeRoots": ["types", "tlua_modules/@types"]
+  },
+  "include": ["**/*.tl"],
+  "exclude": ["dist"]
+}
+```
+
+`types: []` means all ambient `.d.tl` files (mirrors `tsconfig.types`).
+`typeRoots` defaults are `types` + `tlua_modules/@types`; missing dirs are ignored.
+`.d.tl` files check but never emit.
+
+## Commands
+
+```bash
+./tlua init
+./tlua check
+./tlua check --format=json
+./tlua build --target 5.1 --treeShake
+./tlua build --format=json
+./tlua run main.tl -- arg1 arg2
+./tlua run --check --format=json main.tl
+./tlua run --lua luajit --target 5.1 main.tl
+./tlua watch
+./tlua bindgen --header foo.h --out types/foo.d.tl --shim foo.tl
+./tlua lsp
+```
+
+`check`/`build`/`run --check` accept `--format=text|json` (default `text`,
+exit code unchanged). `watch` stays text (streaming logs). `--target` only
+accepts `5.4`/`5.1`. `build` with no `.tl` files is `no .tl files found`.
+
+## JSON diagnostics (for agents)
+
+```bash
+./tlua check --format=json
+```
+
+```json
+[
+  {
+    "file": "bad.tl",
+    "line": 1,
+    "column": 7,
+    "endLine": 1,
+    "endColumn": 8,
+    "severity": "error",
+    "code": "TL3010",
+    "category": "checker",
+    "message": "type '\"oops\"' is not assignable to type 'number'"
+  }
+]
+```
+
+Keys are stable and sorted by file/line/column. `code` ranges:
+`TL1xxx` lexer, `TL2xxx` parser, `TL3xxx` checker, `TL37xx` macros,
+`TL38xx` concurrency, `TL4xxx` project. `category` derives from the code.
+
+## Packages
+
+```bash
+./tlua mod init
+./tlua mod get example.com/greet@v1.2.0
+./tlua mod fetch
+./tlua mod vendor
+./tlua mod list
+./tlua mod graph
+```
+
+Modules are git repos addressed by path (`github.com/owner/repo[/sub]`),
+pinned in `tlua.toml`/`tlua.lock` (MVS, `exact` pins, `replace` for local
+paths). `vendor` copies `*.tl` into `tlua_modules/<path>/`; builds emit
+`tlua_modules/**/*.tl` to `dist/tlua_modules/...` and inject a bootstrap
+prelude so `lua dist/main.lua` runs without `LUA_PATH` setup.
+
+A typed dependency boundary looks like this:
+
+```lua
+-- math_utils.tl
+local M: { double(n: number): number } = {
+  double = function(n: number): number return n * 2 end,
+}
+return M
+```
+
+```lua
+-- main.tl
+import U from "math_utils"
+print(U.double(21))
+```
+
+## LSP (stdio)
+
+```bash
+./tlua lsp
+```
+
+Incremental sync (`textDocumentSync: 2`), hover, definition, completion on
+`.`/`:` (members included), references, rename, document symbols. Diagnostics
+push as `textDocument/publishDiagnostics` with `{range, severity, code,
+source: "tlua", message}`. Single-file mode has no ambient context — for
+multi-file projects, trust `tlua check`, not single-file hover.
+
+## sourceMap and treeShake
+
+```bash
+./tlua build --sourceMap
+./tlua build --treeShake
+```
+
+`--sourceMap` writes `<out>.lua.map` (V3 + `sourcesContent`) plus a
+`--# sourceMappingURL=` footer. `--treeShake` drops zero-reference pure local
+functions (`local function f` / single `local x = function`, transitive).
+Globals, methods, table fields, `require`/`import`, `return`-reachable and
+multi-value/attributed locals are never removed. Unknown AST nodes disable
+shaking for that file (fail-safe).
