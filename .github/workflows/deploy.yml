@@ -23,11 +23,16 @@ jobs:
         with:
           fetch-depth: 0
       - name: Checkout compiler (for snippet verification)
+        # Cross-repo checkout: works with the default token while
+        # types-lua/TypeLua is public. If TypeLua is private, add a
+        # fine-grained PAT (read-only on TypeLua contents) as the
+        # TYPE_LUA_READ_TOKEN secret in this repo; it is used when set.
         uses: actions/checkout@v4
         with:
           repository: types-lua/TypeLua
           path: typelua
           fetch-depth: 1
+          token: ${{ secrets.TYPE_LUA_READ_TOKEN || github.token }}
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
