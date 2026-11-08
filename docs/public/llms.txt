@@ -10,7 +10,7 @@
 
 ## Guide (site: https://types-lua.github.io/docs/)
 
-- [Index](https://types-lua.github.io/docs/en/00-index): what/why, doc map
+- [Index](https://types-lua.github.io/docs/en/): what/why, doc map
 - [Quickstart](https://types-lua.github.io/docs/en/01-quickstart): init/check/build/run in 5 minutes
 - [Language](https://types-lua.github.io/docs/en/02-language): types, declarations, narrowing, classes, generics
 - [CLI & Tooling](https://types-lua.github.io/docs/en/03-cli): tlua.json, `--format=json`, packages, LSP

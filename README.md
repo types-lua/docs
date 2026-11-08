@@ -19,8 +19,8 @@ If a snippet needs LuaJIT/`.so` to *run*, it still *checks* clean on 5.4.
 
 ## For humans
 
-- English: `en/00-index.md` → `en/01-quickstart.md` → `en/02-language.md` → `en/03-cli.md` → `en/04-concurrency.md` → `en/05-ffi.md` → `en/06-patterns.md`
-- 中文：`zh/00-index.md` → `zh/01-quickstart.md` → …（同构）
+- English: `en/index.md` → `en/01-quickstart.md` → `en/02-language.md` → `en/03-cli.md` → `en/04-concurrency.md` → `en/05-ffi.md` → `en/06-patterns.md`
+- 中文：`zh/index.md` → `zh/01-quickstart.md` → …（同构）
 
 ## Live site (GitHub Pages)
 

@@ -4,7 +4,7 @@
 
 ## Reading order
 
-1. `en/00-index.md` — what/why, doc map (read first)
+1. `en/index.md` — what/why, doc map (read first)
 2. `en/01-quickstart.md` — init/check/build/run in 5 minutes
 3. `en/02-language.md` — types, declarations, narrowing, classes, generics
 4. `en/03-cli.md` — `tlua.json`, CLI flags, `--format=json`, LSP, diagnostics

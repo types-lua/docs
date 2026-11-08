@@ -4,7 +4,7 @@
 
 ## 阅读顺序
 
-1. `zh/00-index.md` —— 总览（先读）
+1. `zh/index.md` —— 总览（先读）
 2. `zh/01-quickstart.md` —— 5 分钟上手
 3. `zh/02-language.md` —— 类型、声明、窄化、类、泛型
 4. `zh/03-cli.md` —— `tlua.json`、CLI、`--format=json`、LSP、诊断

@@ -10,7 +10,7 @@
 
 ## 指南（站点：https://types-lua.github.io/docs/）
 
-- [总览](https://types-lua.github.io/docs/zh/00-index)：是什么、为什么、文档地图
+- [总览](https://types-lua.github.io/docs/zh/)：是什么、为什么、文档地图
 - [快速开始](https://types-lua.github.io/docs/zh/01-quickstart)：5 分钟 init/check/build/run
 - [语言参考](https://types-lua.github.io/docs/zh/02-language)：类型、声明、窄化、类、泛型
 - [命令行与工具](https://types-lua.github.io/docs/zh/03-cli)：tlua.json、`--format=json`、包管理、LSP

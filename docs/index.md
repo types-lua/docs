@@ -9,13 +9,13 @@ hero:
   actions:
     - theme: brand
       text: English guide
-      link: /en/00-index
+      link: /en/
     - theme: alt
       text: 中文指南
-      link: /zh/00-index
+      link: /zh/
     - theme: alt
       text: llms.txt
-      link: /llms.txt
+      link: https://types-lua.github.io/docs/llms.txt
 features:
   - title: For agents
     details: llms.txt + llms-full.txt (EN), llms-zh.txt + llms-full-zh.txt (ZH). Every snippet passes tlua check. JSON diags via --format=json.
@@ -27,12 +27,14 @@ features:
 
 ## Start
 
-- [English index](/en/00-index) · [Quickstart](/en/01-quickstart) · [Language](/en/02-language)
-- [中文总览](/zh/00-index) · [快速开始](/zh/01-quickstart) · [语言参考](/zh/02-language)
+- [English index](/en/) · [Quickstart](/en/01-quickstart) · [Language](/en/02-language)
+- [中文总览](/zh/) · [快速开始](/zh/01-quickstart) · [语言参考](/zh/02-language)
 
-## llm.txt
+## llms.txt
 
-- [`llms.txt`](/llms.txt) — concise English
-- [`llms-full.txt`](/llms-full.txt) — full English, single file
-- [`llms-zh.txt`](/llms-zh.txt) — 简明中文
-- [`llms-full-zh.txt`](/llms-full-zh.txt) — 完整中文，单文件
+Static files can't be base-rewritten, so these use absolute site URLs:
+
+- [`llms.txt`](https://types-lua.github.io/docs/llms.txt) — concise English
+- [`llms-full.txt`](https://types-lua.github.io/docs/llms-full.txt) — full English, single file
+- [`llms-zh.txt`](https://types-lua.github.io/docs/llms-zh.txt) — 简明中文
+- [`llms-full-zh.txt`](https://types-lua.github.io/docs/llms-full-zh.txt) — 完整中文，单文件
