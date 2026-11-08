@@ -18,6 +18,7 @@
 - [FFI & Native](https://types-lua.github.io/docs/en/05-ffi): ffi, bindgen, shims, .d.tl, assets
 - [Patterns & Fixes](https://types-lua.github.io/docs/en/06-patterns): recipes + TL error-fix table
 - [Testing](https://types-lua.github.io/docs/en/07-testing): `tlua test`, assertions, CI recipe
+- [Examples](https://types-lua.github.io/docs/en/08-examples): `tlua example`, cargo-style runs
 
 ## Quickstart
 
@@ -56,6 +57,15 @@ return {
   ["adds"] = function(): void T.eq(1 + 1, 2) end,
 }
 ```
+
+## Examples (cargo style)
+
+```
+tlua example              # list examples/*.tl and examples/*/main.tl
+tlua example basic -- a   # run with arguments
+```
+
+The first `---` line of an example is its description.
 
 ## Rules
 

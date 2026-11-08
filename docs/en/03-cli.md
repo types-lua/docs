@@ -104,6 +104,17 @@ import U from "math_utils"
 print(U.double(21))
 ```
 
+## Examples
+
+`tlua example` lists `examples/*.tl` and `examples/*/main.tl` and runs one by
+name (see [Examples](./08-examples)).
+
+```bash
+tlua example
+tlua example basic --check
+tlua example basic --lua lua5.4
+```
+
 ## Testing
 
 `tlua test` discovers `tests/**`, type-checks the project, injects the

@@ -104,6 +104,17 @@ import U from "math_utils"
 print(U.double(21))
 ```
 
+## 示例
+
+`tlua example` 列出 `examples/*.tl` 与 `examples/*/main.tl`，按名字运行
+（详见 [示例](./08-examples)）。
+
+```bash
+tlua example
+tlua example basic --check
+tlua example basic --lua lua5.4
+```
+
 ## 测试
 
 `tlua test` 自动发现 `tests/**`、先做全量类型检查、注入 `tlua_test` 断言模块，

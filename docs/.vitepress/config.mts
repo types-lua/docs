@@ -16,6 +16,7 @@ const enSidebar = [
   { text: 'FFI & Native', link: '/en/05-ffi' },
   { text: 'Patterns & Fixes', link: '/en/06-patterns' },
   { text: 'Testing', link: '/en/07-testing' },
+  { text: 'Examples', link: '/en/08-examples' },
 ]
 
 const zhSidebar = [
@@ -27,6 +28,7 @@ const zhSidebar = [
   { text: 'FFI 与原生', link: '/zh/05-ffi' },
   { text: '模式与排错', link: '/zh/06-patterns' },
   { text: '测试', link: '/zh/07-testing' },
+  { text: '示例', link: '/zh/08-examples' },
 ]
 
 export default defineConfig({
