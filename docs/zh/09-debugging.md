@@ -3,6 +3,9 @@
 `tlua dap` 是一个 Debug Adapter Protocol 服务器。VS Code 扩展会自动启动它；
 任何 DAP 客户端都可以通过 stdio 使用。
 
+从 [vscode-typelua Releases](https://github.com/types-lua/vscode-typelua/releases)
+安装扩展（`typelua-X.Y.Z.vsix`，可用随附的 `SHA256SUMS.txt` 校验）。
+
 ## 在 VS Code 中调试
 
 在 `.tl` 文件上按 `F5`，或执行 **TypeLua: Debug File**。最小 `launch.json`：

@@ -3,6 +3,10 @@
 `tlua dap` is a Debug Adapter Protocol server. The VS Code extension starts it
 automatically; any DAP client can use it over stdio.
 
+Install the extension from
+[vscode-typelua Releases](https://github.com/types-lua/vscode-typelua/releases)
+(`typelua-X.Y.Z.vsix`, verified with the published `SHA256SUMS.txt`).
+
 ## From VS Code
 
 Press `F5` on a `.tl` file, or run **TypeLua: Debug File**. A minimal
