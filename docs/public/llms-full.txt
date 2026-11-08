@@ -23,6 +23,7 @@
 - [Patterns & Fixes](https://types-lua.github.io/docs/en/06-patterns): recipes + TL error-fix table
 - [Testing](https://types-lua.github.io/docs/en/07-testing): `tlua test`, assertions, CI recipe
 - [Examples](https://types-lua.github.io/docs/en/08-examples): `tlua example`, cargo-style runs
+- [Debugging](https://types-lua.github.io/docs/en/09-debugging): `tlua dap`, breakpoints, Test Explorer
 
 ## Quickstart
 
@@ -70,6 +71,16 @@ tlua example basic -- a   # run with arguments
 ```
 
 The first `---` line of an example is its description.
+
+## Debugging
+
+```
+tlua dap                    # stdio DAP; VS Code drives it for F5/tests
+tlua test --list --format=json
+```
+
+Needs an external `lua5.4`/`luajit`; pause-while-running and evaluate are not
+supported.
 
 ## Rules
 
@@ -624,6 +635,16 @@ tlua test --filter store --format=json
 tlua test --lua lua5.4
 ```
 
+## Debugging
+
+`tlua dap` is a stdio Debug Adapter Protocol server; the VS Code extension
+starts it for `F5`/Test Explorer debugging (see [Debugging](./09-debugging)).
+
+```bash
+tlua dap
+tlua test --list --format=json
+```
+
 ## LSP (stdio)
 
 ```bash
@@ -1018,6 +1039,9 @@ Failure details from assertions are counted as *checks*, so "1160 checks" means
 
 `--format=json` is NDJSON: one object per case plus a final
 `{"summary":true,...}` line, which is convenient for agents and dashboards.
+`tlua test --list --format=json` enumerates cases without running them
+(`{"module","case","file"}` per line); the VS Code Test Explorer uses it, and
+`--module NAME` / `--case NAME` run exactly one case.
 
 
 <!-- docs/en/08-examples.md -->
@@ -1092,4 +1116,77 @@ tlua example batch --lua lua5.4
 ```
 
 See [Testing](./07-testing) for the companion `tlua test` workflow.
+
+
+<!-- docs/en/09-debugging.md -->
+
+# Debugging (EN)
+
+`tlua dap` is a Debug Adapter Protocol server. The VS Code extension starts it
+automatically; any DAP client can use it over stdio.
+
+## From VS Code
+
+Press `F5` on a `.tl` file, or run **TypeLua: Debug File**. A minimal
+`launch.json`:
+
+```json
+{
+  "type": "typelua",
+  "request": "launch",
+  "name": "Debug TypeLua",
+  "program": "${file}",
+  "args": [],
+  "stopOnEntry": false,
+  "check": false
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `program` | Entry `.tl` file (required) |
+| `args` | Script arguments (`arg[1..]`) |
+| `cwd` | Working directory (defaults to the workspace folder) |
+| `lua` | Interpreter; default auto-detects `lua5.4`, then `luajit` |
+| `target` | `5.4` (default) or `5.1` (LuaJIT) |
+| `check` | Type-check before running |
+| `stopOnEntry` | Break on the first executable line |
+| `test` / `testCase` | Debug a test file / a single case |
+
+Breakpoints, step in/over/out, the call stack, locals and program output all
+work in the standard Debug view. Positions are mapped from emitted Lua back to
+`.tl` lines through the compiler's statement-level source maps.
+
+## Test Explorer
+
+The Testing view lists discovered cases (`tests/**/*.tl`, `*_test.tl`,
+`*.test.tl`). The inline ▶ runs a case through `tlua test`; the 🐞 starts a
+debug session for it. Pass/fail flows back to the Testing view through a
+custom `typelua/testResult` DAP event.
+
+Discovery uses `tlua test --list`:
+
+```bash
+tlua test --list --format=json    # {"module","case","file"} per line
+```
+
+## How it works
+
+1. Compile the project in memory with mappings (`compiler.Render`).
+2. Write the emitted Lua and a debug configuration to a temp directory.
+3. Run `dap_agent.lua` under the selected Lua interpreter. The agent installs
+   line and call hooks, stops on mapped breakpoints or step conditions, and
+   talks to the adapter over stderr (`##tlua-dap` prefix); program output stays
+   on stdout.
+4. The adapter translates bridge messages to DAP responses/events and maps
+   runtime lines back to `.tl` positions.
+
+## Limitations
+
+- **Pause while running** is not implemented; breakpoints set during execution
+  apply at the next stop.
+- **Evaluate/watch expressions** and **set variable** are not supported.
+- The debugger needs an external Lua interpreter (`lua5.4` or `luajit`); the
+  embedded `tlua run` runtime has no local-variable inspection.
+- FFI programs need `luajit` plus `--target 5.1`.
 

@@ -126,6 +126,16 @@ tlua test --filter store --format=json
 tlua test --lua lua5.4
 ```
 
+## 调试
+
+`tlua dap` 是 stdio 的 Debug Adapter Protocol 服务器；VS Code 扩展用它实现
+`F5` 与测试浏览器调试（详见 [调试](./09-debugging)）。
+
+```bash
+tlua dap
+tlua test --list --format=json
+```
+
 ## LSP（stdio）
 
 ```bash

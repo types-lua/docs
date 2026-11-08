@@ -126,6 +126,16 @@ tlua test --filter store --format=json
 tlua test --lua lua5.4
 ```
 
+## Debugging
+
+`tlua dap` is a stdio Debug Adapter Protocol server; the VS Code extension
+starts it for `F5`/Test Explorer debugging (see [Debugging](./09-debugging)).
+
+```bash
+tlua dap
+tlua test --list --format=json
+```
+
 ## LSP (stdio)
 
 ```bash

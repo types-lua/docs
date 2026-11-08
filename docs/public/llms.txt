@@ -19,6 +19,7 @@
 - [Patterns & Fixes](https://types-lua.github.io/docs/en/06-patterns): recipes + TL error-fix table
 - [Testing](https://types-lua.github.io/docs/en/07-testing): `tlua test`, assertions, CI recipe
 - [Examples](https://types-lua.github.io/docs/en/08-examples): `tlua example`, cargo-style runs
+- [Debugging](https://types-lua.github.io/docs/en/09-debugging): `tlua dap`, breakpoints, Test Explorer
 
 ## Quickstart
 
@@ -66,6 +67,16 @@ tlua example basic -- a   # run with arguments
 ```
 
 The first `---` line of an example is its description.
+
+## Debugging
+
+```
+tlua dap                    # stdio DAP; VS Code drives it for F5/tests
+tlua test --list --format=json
+```
+
+Needs an external `lua5.4`/`luajit`; pause-while-running and evaluate are not
+supported.
 
 ## Rules
 

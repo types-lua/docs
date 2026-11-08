@@ -90,3 +90,5 @@ tlua test · 4 file(s)
 
 `--format=json` 输出 NDJSON：每个用例一行对象，最后一行是
 `{"summary":true,...}`，方便 agent 或看板消费。
+`tlua test --list --format=json` 只枚举用例（每行 `{"module","case","file"}`）；
+VS Code 测试浏览器使用它，`--module NAME` / `--case NAME` 可精确运行单个用例。

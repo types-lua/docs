@@ -97,3 +97,6 @@ Failure details from assertions are counted as *checks*, so "1160 checks" means
 
 `--format=json` is NDJSON: one object per case plus a final
 `{"summary":true,...}` line, which is convenient for agents and dashboards.
+`tlua test --list --format=json` enumerates cases without running them
+(`{"module","case","file"}` per line); the VS Code Test Explorer uses it, and
+`--module NAME` / `--case NAME` run exactly one case.

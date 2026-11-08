@@ -17,6 +17,7 @@ const enSidebar = [
   { text: 'Patterns & Fixes', link: '/en/06-patterns' },
   { text: 'Testing', link: '/en/07-testing' },
   { text: 'Examples', link: '/en/08-examples' },
+  { text: 'Debugging', link: '/en/09-debugging' },
 ]
 
 const zhSidebar = [
@@ -29,6 +30,7 @@ const zhSidebar = [
   { text: '模式与排错', link: '/zh/06-patterns' },
   { text: '测试', link: '/zh/07-testing' },
   { text: '示例', link: '/zh/08-examples' },
+  { text: '调试', link: '/zh/09-debugging' },
 ]
 
 export default defineConfig({
