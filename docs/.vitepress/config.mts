@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitepress'
+import typeluaGrammar, { embedded as typeluaDeps } from './typelua.tm.mjs'
 
 // Site URL: https://types-lua.github.io/docs/
 // Both languages are prefixed locales (/en/, /zh/) so VitePress's language
@@ -42,6 +43,10 @@ export default defineConfig({
     ['meta', { property: 'og:title', content: 'TypeLua Docs' }],
     ['meta', { property: 'og:description', content: 'Typed superset of Lua — EN/ZH guides, CLI reference, llms.txt for agents.' }],
   ],
+  // Register the TypeLua dialect grammar; fenced blocks use ```typelua.
+  markdown: {
+    languages: [...typeluaDeps, typeluaGrammar],
+  },
   locales: {
     en: {
       label: 'English',
@@ -71,10 +76,49 @@ export default defineConfig({
           { text: '编译器', link: 'https://github.com/types-lua/TypeLua' },
         ],
         sidebar: { '/zh/': zhSidebar },
+        // VitePress 1.6 ships no UI translations; spell the zh strings out.
+        outline: { label: '本页目录', level: [2, 3] },
+        docFooter: { prev: '上一篇', next: '下一篇' },
+        lastUpdated: { text: '最后更新于' },
+        returnToTopLabel: '回到顶部',
+        sidebarMenuLabel: '菜单',
+        darkModeSwitchLabel: '外观',
+        lightModeSwitchTitle: '切换到浅色模式',
+        darkModeSwitchTitle: '切换到深色模式',
+        langMenuLabel: '切换语言',
+        editLink: {
+          pattern: 'https://github.com/types-lua/docs/edit/main/docs/:path',
+          text: '在 GitHub 上编辑此页',
+        },
+        search: {
+          provider: 'local',
+          options: {
+            translations: {
+              button: { buttonText: '搜索', buttonAriaLabel: '搜索' },
+              modal: {
+                noResultsText: '没有找到结果',
+                resetButtonTitle: '清除查询条件',
+                footer: {
+                  selectText: '选择',
+                  navigateText: '切换',
+                  closeText: '关闭',
+                },
+              },
+            },
+          },
+        },
       },
     },
   },
   themeConfig: {
+    // Root (non-locale) landing page: it needs its own nav, because locale
+    // navs only apply under /en/ and /zh/.
+    nav: [
+      { text: 'Guide', link: '/en/' },
+      { text: '中文', link: '/zh/' },
+      { text: 'llms.txt', link: `${SITE}/llms.txt` },
+      { text: 'Compiler', link: 'https://github.com/types-lua/TypeLua' },
+    ],
     socialLinks: [
       { icon: 'github', link: 'https://github.com/types-lua/TypeLua' },
     ],

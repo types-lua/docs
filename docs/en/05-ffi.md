@@ -5,7 +5,7 @@ types on 5.4 too, so snippets below still `check` clean everywhere.
 
 ## Direct FFI (explicit boundary)
 
-```lua
+```typelua
 local ffi = require("ffi")
 ffi.cdef[[
   int add(int a, int b);
@@ -39,19 +39,19 @@ when the filename differs from `lib<base>.so`.
 Hide the three shapes (C module / FFI-direct / shim process) behind
 `require` + `.d.tl`:
 
-```lua
+```typelua
 -- native_shim.lua (HOW, plain Lua kept next to the .tl)
 local M = {}
 function M.native_add(a, b) return a + b end
 return M
 ```
 
-```lua
+```typelua
 -- native.d.tl (WHAT, checks but never emits)
 declare type NativeLib = { native_add(a: number, b: number): number }
 ```
 
-```lua
+```typelua
 -- main.tl (caller only sees require + as; in a real project NativeLib
 -- comes from native.d.tl, here it is spelled locally so the file checks alone)
 type NativeLib = { native_add(a: number, b: number): number }

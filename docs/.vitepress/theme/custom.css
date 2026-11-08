@@ -1,57 +1,386 @@
-/* Elegant TypeLua theme: quiet, airy, print-like. Only variable + type tweaks,
-   no layout hacks, so VitePress upgrades don't break it. */
+/* TypeLua docs theme — quiet, print-like, with a crafted code face.
+   Rules:
+   - Only theme variables + scoped selectors (no layout hacks), so VitePress
+     upgrades cannot silently break the site.
+   - Fonts are self-hosted; nothing depends on Google Fonts at runtime.
+   - Every color goes through a --vp-* variable so dark mode stays automatic. */
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  /* Google ships this subset as a variable font (wght 100..900). */
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('./fonts/jetbrains-mono-latin-var.woff2') format('woff2');
+  /* Latin only; code comments in Chinese fall back to the CJK stack. */
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122,
+    U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
 :root {
-  --vp-c-brand-1: #5b5bd6;
-  --vp-c-brand-2: #4646b8;
-  --vp-c-brand-3: #36368f;
-  --vp-c-brand-soft: rgba(91, 91, 214, 0.12);
+  --vp-c-brand-1: #5457c9;
+  --vp-c-brand-2: #4446ab;
+  --vp-c-brand-3: #35378a;
+  --vp-c-brand-soft: rgba(84, 87, 201, 0.12);
 
-  --vp-font-family-base: "Inter", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --vp-font-family-mono: "JetBrains Mono", "SFMono-Regular", ui-monospace, "PingFang SC", monospace;
+  --vp-font-family-base: 'Inter', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --vp-font-family-mono: 'JetBrains Mono', 'SFMono-Regular', ui-monospace,
+    'PingFang SC', 'Microsoft YaHei', monospace;
 
-  --vp-layout-max-width: 1160px;
-  --vp-content-max-width: 760px;
+  --vp-layout-max-width: 1180px;
+  --vp-content-max-width: 748px;
+  --vp-sidebar-width: 264px;
+
+  /* Code rhythm: slightly larger and airier than the default. */
+  --vp-code-font-size: 0.875em;
+  --vp-code-line-height: 1.72;
+  --vp-code-block-bg: #f8f8f7;
+  --vp-code-block-color: #2b2b33;
+
+  --tl-code-radius: 12px;
+  --tl-hairline: color-mix(in srgb, var(--vp-c-divider) 72%, transparent);
+  --tl-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 .dark {
-  --vp-c-brand-1: #8f8ff0;
-  --vp-c-brand-2: #a5a5f5;
-  --vp-c-brand-soft: rgba(143, 143, 240, 0.16);
+  --vp-c-brand-1: #9a9cf5;
+  --vp-c-brand-2: #b0b2fa;
+  --vp-c-brand-3: #c6c7fc;
+  --vp-c-brand-soft: rgba(154, 156, 245, 0.16);
+
+  /* Lift code blocks off the page instead of sinking into it. */
+  --vp-code-block-bg: #202127;
+  --vp-code-block-color: #d6d6e0;
 }
 
-/* Softer hero, tighter prose rhythm */
-.VPHero .tagline {
-  max-width: 560px;
+/* ---------- Prose ---------- */
+
+.vp-doc {
+  font-variant-numeric: tabular-nums;
+}
+
+.vp-doc h1,
+.vp-doc h2,
+.vp-doc h3,
+.vp-doc h4 {
+  letter-spacing: -0.014em;
   text-wrap: balance;
 }
 
-.vp-doc p {
-  line-height: 1.75;
+.vp-doc h1 {
+  font-size: 2.05rem;
+  line-height: 1.2;
+}
+
+.vp-doc h2 {
+  margin-top: 3rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--tl-hairline);
+  font-size: 1.5rem;
+}
+
+.vp-doc h3 {
+  margin-top: 2.1rem;
+  font-size: 1.16rem;
+}
+
+/* Lead paragraph: one step up, one step quieter. */
+.vp-doc h1 + p {
+  margin-top: 0.9rem;
+  font-size: 1.04rem;
+  line-height: 1.7;
+  color: var(--vp-c-text-2);
+}
+
+.vp-doc p,
+.vp-doc li {
+  line-height: 1.78;
 }
 
 .vp-doc li + li {
-  margin-top: 4px;
+  margin-top: 0.3rem;
 }
 
-/* Code: calm background, readable contrast in both modes */
-.vp-doc div[class*="language-"] {
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 10px;
-}
-
-.vp-doc code {
-  font-size: 0.86em;
-}
-
-/* Tables: no sticky glare, gentle header */
-.vp-doc th {
+.vp-doc strong {
   font-weight: 600;
+}
+
+.vp-doc blockquote {
+  margin: 1.4rem 0;
+  padding: 0.55rem 1.05rem;
+  border-left: 3px solid var(--vp-c-brand-1);
+  border-radius: 0 8px 8px 0;
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-2);
+}
+
+.vp-doc blockquote > p {
+  margin: 0.2rem 0;
+}
+
+.vp-doc a {
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+  transition: color 0.18s var(--tl-ease);
+}
+
+/* ---------- Inline code ---------- */
+
+.vp-doc :not(pre) > code {
+  padding: 0.12em 0.34em;
+  border: 0;
+  border-radius: 5px;
+  /* Quiet tinted chip: visible enough to scan, never a "keycap" wall. */
+  background: var(--vp-c-default-soft);
+  color: var(--vp-c-text-1);
+  font-size: 0.855em;
+  font-weight: 500;
+  /* Ligatures would render != / -> as unfamiliar glyphs in a Lua dialect. */
+  font-variant-ligatures: none;
+  font-feature-settings: 'liga' 0, 'calt' 0;
+  /* Long identifiers must wrap on narrow screens instead of overflowing. */
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.vp-doc a > code {
+  color: var(--vp-c-brand-1);
+}
+
+/* ---------- Code blocks ---------- */
+
+.vp-doc div[class*='language-'] {
+  position: relative;
+  margin: 1.35rem 0;
+  border: 1px solid var(--tl-hairline);
+  border-radius: var(--tl-code-radius);
+  background: var(--vp-code-block-bg);
+  box-shadow: 0 1px 2px rgba(16, 16, 32, 0.04),
+    0 8px 24px -18px rgba(16, 16, 32, 0.28);
+  transition: box-shadow 0.25s var(--tl-ease);
+}
+
+.vp-doc div[class*='language-']:hover {
+  box-shadow: 0 1px 2px rgba(16, 16, 32, 0.05),
+    0 14px 32px -20px rgba(16, 16, 32, 0.34);
+}
+
+.vp-doc div[class*='language-'] pre,
+.vp-doc div[class*='language-'] code {
+  font-family: var(--vp-font-family-mono);
+  font-variant-ligatures: none;
+  font-feature-settings: 'liga' 0, 'calt' 0;
+}
+
+.vp-doc div[class*='language-'] code {
+  font-size: var(--vp-code-font-size);
+  line-height: var(--vp-code-line-height);
+}
+
+.vp-doc div[class*='language-'] pre {
+  padding: 1.05rem 1.2rem;
+  background: transparent;
+}
+
+/* Language badge: a small, quiet label rather than default all-caps noise. */
+.vp-doc div[class*='language-'] > span.lang {
+  top: 0.62rem;
+  right: 3.1rem;
+  font-family: var(--vp-font-family-mono);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--vp-c-text-3);
+  opacity: 0.85;
+}
+
+.vp-doc div[class*='language-'] > button.copy {
+  top: 0.5rem;
+  right: 0.55rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  transition: background-color 0.2s var(--tl-ease),
+    border-color 0.2s var(--tl-ease);
+}
+
+.vp-doc div[class*='language-'] > button.copy:hover {
+  border-color: var(--tl-hairline);
+  background: var(--vp-c-bg-alt);
+}
+
+/* Thin, unobtrusive scrollbars inside code blocks (WebKit + Firefox). */
+.vp-doc div[class*='language-'] pre {
+  scrollbar-width: thin;
+  scrollbar-color: var(--vp-c-divider) transparent;
+}
+
+.vp-doc div[class*='language-'] pre::-webkit-scrollbar {
+  height: 8px;
+}
+
+.vp-doc div[class*='language-'] pre::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background: var(--vp-c-divider);
+}
+
+/* ---------- Tables ---------- */
+
+.vp-doc table {
+  /* Keep VitePress's horizontal scroll (display:block) so wide tables never
+     clip on narrow screens; style it without changing layout behaviour. */
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 1.4rem 0;
+  overflow-x: auto;
+  border: 1px solid var(--tl-hairline);
+  border-radius: 10px;
+  border-collapse: separate;
+  border-spacing: 0;
+} 
+
+.vp-doc tr {
+  border-top: none;
+  background: transparent;
+}
+
+.vp-doc tbody tr:nth-child(2n) {
   background: var(--vp-c-bg-soft);
 }
 
-/* Sidebar current link: underline instead of heavy pill */
+.vp-doc th {
+  padding: 0.62rem 0.9rem;
+  border: none;
+  border-bottom: 1px solid var(--tl-hairline);
+  background: var(--vp-c-bg-alt);
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-align: left;
+  color: var(--vp-c-text-2);
+}
+
+.vp-doc td {
+  padding: 0.6rem 0.9rem;
+  border: none;
+  vertical-align: top;
+}
+
+.vp-doc td code {
+  /* Let cell code wrap; nowrap forces the whole table wider than the page.
+     break-word (not anywhere) keeps TLxxxx codes from splitting mid-token. */
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+/* ---------- Sidebar / nav trim ---------- */
+
+.VPSidebarItem .text {
+  font-size: 14px;
+}
+
 .VPSidebarItem.is-active > .item > .link {
-  text-decoration: underline;
-  text-underline-offset: 4px;
+  text-decoration: none;
+}
+
+.VPSidebarItem.is-active > .item > .link .text {
+  font-weight: 600;
+  color: var(--vp-c-brand-1);
+}
+
+.VPSidebarItem.is-link > .item:hover .text {
+  color: var(--vp-c-brand-1);
+  transition: color 0.18s var(--tl-ease);
+}
+
+.VPNavBarTitle .title {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* ---------- Home ---------- */
+
+.VPHero .name .clip {
+  /* Quiet indigo→violet wash; readable in both themes. */
+  background: linear-gradient(
+    92deg,
+    var(--vp-c-brand-3) 0%,
+    var(--vp-c-brand-1) 48%,
+    #8f6fe8 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.dark .VPHero .name .clip {
+  background: linear-gradient(
+    92deg,
+    var(--vp-c-brand-2) 0%,
+    var(--vp-c-brand-1) 50%,
+    #c0a4ff 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.VPHero .tagline {
+  max-width: 34em;
+  line-height: 1.65;
+  text-wrap: balance;
+}
+
+.VPButton.brand {
+  box-shadow: 0 1px 2px rgba(40, 40, 90, 0.16),
+    0 8px 20px -12px rgba(60, 60, 150, 0.45);
+}
+
+.VPFeature {
+  border: 1px solid var(--tl-hairline);
+  background: var(--vp-c-bg-soft) !important;
+  transition: transform 0.22s var(--tl-ease), border-color 0.22s var(--tl-ease),
+    box-shadow 0.22s var(--tl-ease);
+}
+
+.VPFeature.link:hover {
+  transform: translateY(-2px);
+  border-color: var(--vp-c-brand-soft);
+  box-shadow: 0 10px 26px -18px rgba(30, 30, 80, 0.4);
+}
+
+.VPFeature .title {
+  letter-spacing: -0.01em;
+}
+
+.VPFeature .details {
+  line-height: 1.65;
+}
+
+/* ---------- Global niceties ---------- */
+
+::selection {
+  background: var(--vp-c-brand-soft);
+}
+
+.vp-doc :focus-visible,
+.VPButton:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--vp-c-brand-1);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .VPFeature,
+  .VPButton.brand,
+  .vp-doc a,
+  .vp-doc div[class*='language-'] {
+    transition: none !important;
+  }
+  .VPFeature.link:hover {
+    transform: none;
+  }
 }

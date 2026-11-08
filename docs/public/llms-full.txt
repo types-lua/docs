@@ -1,6 +1,6 @@
 # TypeLua — full reference (EN, self-contained)
 
-> Generated from docs/en/*.md. Every ```lua block passes `tlua check`.
+> Generated from docs/en/*.md. Every ```typelua block passes `tlua check`.
 
 # TypeLua
 
@@ -87,7 +87,7 @@ Full reference: `https://types-lua.github.io/docs/llms-full.txt`. Chinese: `http
 
 ## Minimal program (verified)
 
-```lua
+```typelua
 type Point = { x: number, y: number }
 local function dist(a: Point, b: Point): number
   local dx: number = a.x - b.x
@@ -142,7 +142,7 @@ go build -o tlua ./cmd/tlua
 
 ## 2. Your first typed program
 
-```lua
+```typelua
 type Point = { x: number, y: number }
 local function dist(a: Point, b: Point): number
   local dx: number = a.x - b.x
@@ -186,7 +186,7 @@ The embedded `run` (golua) cannot load C modules by design.
 
 ## 4. Nil safety from the start
 
-```lua
+```typelua
 local function greet(name: string | nil): string
   if name == nil then
     return "hello, stranger"
@@ -200,7 +200,7 @@ print(greet("ada"))
 `strictNilChecks` is on by default: `nil` is not assignable to `string`.
 Narrow with `==nil`/`~=nil`, `type(x)`, `=="lit"`, truthiness, or member paths:
 
-```lua
+```typelua
 type Node = { v: number, next: Node | nil }
 local function head(n: Node | nil): number
   if n == nil then
@@ -230,7 +230,7 @@ Covers SPEC §§2–6 + §8 essentials. Every snippet checks clean.
 
 ## Types
 
-```lua
+```typelua
 local a: any = 1
 local u: unknown = "s"
 local n: number = 1.5
@@ -257,7 +257,7 @@ print(a, u, n, i, f, s, b, #arr, m.alice, tup[1], uni, inter, opt)
 
 ## Type aliases, interfaces, enums
 
-```lua
+```typelua
 type Point = { x: number, y: number }
 type List<T> = { head: T, tail: List<T> | nil }
 interface Named { name: string, greet(msg: string): string }
@@ -279,7 +279,7 @@ Mixed string enums need explicit values on every member after the first
 
 ## Functions (both type syntaxes work)
 
-```lua
+```typelua
 local function add(a: number, b: number): number return a + b end
 local function divmod(a: number, b: number): (number, number) return a / b, a % b end
 local function cat(...nums: number[]): string
@@ -296,7 +296,7 @@ print(add(2, 3), q, r, cat(1, 2, 3))
 Multi-return is `-> (A, B)`; only the last call in an argument list expands.
 Generic functions infer, or take explicit arguments:
 
-```lua
+```typelua
 local function id<T>(v: T): T return v end
 local function first<T>(xs: T[]): T | nil
   if #xs == 0 then return nil end
@@ -310,7 +310,7 @@ Explicit args also work on methods and constructors: `obj:m<T>()`, `C.new<T>()`.
 
 ## Narrowing (nil-safe Lua)
 
-```lua
+```typelua
 local function use(x: number | string | nil): string
   if x == nil then
     return "none"
@@ -328,7 +328,7 @@ print(use(41))
 Truthiness also narrows (`if x then` drops `nil`/`false`), and member paths
 narrow without a temporary:
 
-```lua
+```typelua
 type Node = { v: number, next: Node | nil }
 local function second(n: Node): number
   if n.next then
@@ -344,7 +344,7 @@ print(second({ v = 1, next = { v = 2, next = nil } }))
 
 ## Classes (nominal, block-scoped)
 
-```lua
+```typelua
 abstract class Animal {
   name: string,
   constructor(name: string) self.name = name end,
@@ -369,7 +369,7 @@ instantiated. Declare-only classes (`declare class`) emit nothing.
 
 ## Advanced types (conditional / keyof / indexed / mapped)
 
-```lua
+```typelua
 type IsString<T> = T extends string ? true : false
 type Head<T> = T extends [infer H, ...unknown[]] ? H : never
 type NameOf<T> = keyof T
@@ -390,7 +390,7 @@ distribute over unions. Indexed access requires every key to exist
 
 ## Imports are typed requires
 
-```lua
+```typelua
 -- math_utils.tl
 local M: { double(n: number): number } = {
   double = function(n: number): number return n * 2 end,
@@ -398,7 +398,7 @@ local M: { double(n: number): number } = {
 return M
 ```
 
-```lua
+```typelua
 -- main.tl
 import U from "math_utils"
 print(U.double(21))
@@ -410,7 +410,7 @@ The checker infers the module type from `return M`; annotate the boundary
 
 ## Macros are hygienic
 
-```lua
+```typelua
 macro twice(x) = (x) + (x)
 macro unless(cond, body) do
   if not (cond) then
@@ -522,7 +522,7 @@ prelude so `lua dist/main.lua` runs without `LUA_PATH` setup.
 
 A typed dependency boundary looks like this:
 
-```lua
+```typelua
 -- math_utils.tl
 local M: { double(n: number): number } = {
   double = function(n: number): number return n * 2 end,
@@ -530,7 +530,7 @@ local M: { double(n: number): number } = {
 return M
 ```
 
-```lua
+```typelua
 -- main.tl
 import U from "math_utils"
 print(U.double(21))
@@ -572,7 +572,7 @@ explicit markers that erase to plain calls.
 
 ## defer / errdefer (LIFO cleanup)
 
-```lua
+```typelua
 local function read(name: string): number
   local log: { close(): void } = {
     close = function(): void print("close", name) end,
@@ -595,7 +595,7 @@ function leaves via an explicit `error(...)`. Never pass bare `...`
 
 ## Coroutines (typed)
 
-```lua
+```typelua
 local co: thread = coroutine.create(function()
   coroutine.yield("step")
 end)
@@ -612,7 +612,7 @@ only on 5.4 (`TL3203` on 5.1). Literal `status(co) == "dead"` narrows.
 
 ## async / await + spawn + chan + select
 
-```lua
+```typelua
 local jobs: chan<integer> = makeChan<integer>(4)
 local done: chan<boolean> = makeChan<boolean>(1)
 
@@ -655,7 +655,7 @@ Rules agents trip on:
   `send` on a closed channel errors; `close` twice errors.
 - `select` uses braces with `case` guards and optional trailing `default`:
 
-```lua
+```typelua
 local ch: chan<integer> = makeChan<integer>(1)
 await ch:send(9)
 select {
@@ -686,7 +686,7 @@ types on 5.4 too, so snippets below still `check` clean everywhere.
 
 ## Direct FFI (explicit boundary)
 
-```lua
+```typelua
 local ffi = require("ffi")
 ffi.cdef[[
   int add(int a, int b);
@@ -720,19 +720,19 @@ when the filename differs from `lib<base>.so`.
 Hide the three shapes (C module / FFI-direct / shim process) behind
 `require` + `.d.tl`:
 
-```lua
+```typelua
 -- native_shim.lua (HOW, plain Lua kept next to the .tl)
 local M = {}
 function M.native_add(a, b) return a + b end
 return M
 ```
 
-```lua
+```typelua
 -- native.d.tl (WHAT, checks but never emits)
 declare type NativeLib = { native_add(a: number, b: number): number }
 ```
 
-```lua
+```typelua
 -- main.tl (caller only sees require + as; in a real project NativeLib
 -- comes from native.d.tl, here it is spelled locally so the file checks alone)
 type NativeLib = { native_add(a: number, b: number): number }
@@ -762,7 +762,7 @@ is never watched.
 
 ## Wrap legacy Lua with a typed boundary
 
-```lua
+```typelua
 -- legacy.lua returns an untyped table; keep it plain Lua.
 -- legacy.tl (typed facade next to it)
 local raw = require("legacy") as any
@@ -776,7 +776,7 @@ Prefer `as` at one place and export the `Legacy` type; don't sprinkle `any`.
 
 ## Module pattern (inferred, frozen at the edge)
 
-```lua
+```typelua
 -- greet.tl
 local Greet: { hello(name: string): string } = {
   hello = function(name: string): string return "hi " .. name end,
@@ -784,7 +784,7 @@ local Greet: { hello(name: string): string } = {
 return Greet
 ```
 
-```lua
+```typelua
 -- main.tl
 import G from "greet"
 print(G.hello("bo"))

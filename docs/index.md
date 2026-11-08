@@ -19,10 +19,16 @@ hero:
 features:
   - title: For agents
     details: llms.txt + llms-full.txt (EN), llms-zh.txt + llms-full-zh.txt (ZH). Every snippet passes tlua check. JSON diags via --format=json.
+    link: https://types-lua.github.io/docs/llms.txt
+    linkText: Open llms.txt
   - title: For humans
     details: Quickstart → language → CLI → concurrency → FFI → patterns. Bilingual, same structure on both sides.
+    link: /en/
+    linkText: Start reading
   - title: Contract
     details: SPEC.md in the compiler repo is normative; examples/ holds 25 runnable programs; TLxxxx codes are stable.
+    link: https://github.com/types-lua/TypeLua/blob/main/SPEC.md
+    linkText: Read SPEC
 ---
 
 ## Start

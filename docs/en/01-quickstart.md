@@ -16,7 +16,7 @@ go build -o tlua ./cmd/tlua
 
 ## 2. Your first typed program
 
-```lua
+```typelua
 type Point = { x: number, y: number }
 local function dist(a: Point, b: Point): number
   local dx: number = a.x - b.x
@@ -60,7 +60,7 @@ The embedded `run` (golua) cannot load C modules by design.
 
 ## 4. Nil safety from the start
 
-```lua
+```typelua
 local function greet(name: string | nil): string
   if name == nil then
     return "hello, stranger"
@@ -74,7 +74,7 @@ print(greet("ada"))
 `strictNilChecks` is on by default: `nil` is not assignable to `string`.
 Narrow with `==nil`/`~=nil`, `type(x)`, `=="lit"`, truthiness, or member paths:
 
-```lua
+```typelua
 type Node = { v: number, next: Node | nil }
 local function head(n: Node | nil): number
   if n == nil then

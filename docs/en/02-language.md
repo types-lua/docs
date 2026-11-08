@@ -4,7 +4,7 @@ Covers SPEC §§2–6 + §8 essentials. Every snippet checks clean.
 
 ## Types
 
-```lua
+```typelua
 local a: any = 1
 local u: unknown = "s"
 local n: number = 1.5
@@ -31,7 +31,7 @@ print(a, u, n, i, f, s, b, #arr, m.alice, tup[1], uni, inter, opt)
 
 ## Type aliases, interfaces, enums
 
-```lua
+```typelua
 type Point = { x: number, y: number }
 type List<T> = { head: T, tail: List<T> | nil }
 interface Named { name: string, greet(msg: string): string }
@@ -53,7 +53,7 @@ Mixed string enums need explicit values on every member after the first
 
 ## Functions (both type syntaxes work)
 
-```lua
+```typelua
 local function add(a: number, b: number): number return a + b end
 local function divmod(a: number, b: number): (number, number) return a / b, a % b end
 local function cat(...nums: number[]): string
@@ -70,7 +70,7 @@ print(add(2, 3), q, r, cat(1, 2, 3))
 Multi-return is `-> (A, B)`; only the last call in an argument list expands.
 Generic functions infer, or take explicit arguments:
 
-```lua
+```typelua
 local function id<T>(v: T): T return v end
 local function first<T>(xs: T[]): T | nil
   if #xs == 0 then return nil end
@@ -84,7 +84,7 @@ Explicit args also work on methods and constructors: `obj:m<T>()`, `C.new<T>()`.
 
 ## Narrowing (nil-safe Lua)
 
-```lua
+```typelua
 local function use(x: number | string | nil): string
   if x == nil then
     return "none"
@@ -102,7 +102,7 @@ print(use(41))
 Truthiness also narrows (`if x then` drops `nil`/`false`), and member paths
 narrow without a temporary:
 
-```lua
+```typelua
 type Node = { v: number, next: Node | nil }
 local function second(n: Node): number
   if n.next then
@@ -118,7 +118,7 @@ print(second({ v = 1, next = { v = 2, next = nil } }))
 
 ## Classes (nominal, block-scoped)
 
-```lua
+```typelua
 abstract class Animal {
   name: string,
   constructor(name: string) self.name = name end,
@@ -143,7 +143,7 @@ instantiated. Declare-only classes (`declare class`) emit nothing.
 
 ## Advanced types (conditional / keyof / indexed / mapped)
 
-```lua
+```typelua
 type IsString<T> = T extends string ? true : false
 type Head<T> = T extends [infer H, ...unknown[]] ? H : never
 type NameOf<T> = keyof T
@@ -164,7 +164,7 @@ distribute over unions. Indexed access requires every key to exist
 
 ## Imports are typed requires
 
-```lua
+```typelua
 -- math_utils.tl
 local M: { double(n: number): number } = {
   double = function(n: number): number return n * 2 end,
@@ -172,7 +172,7 @@ local M: { double(n: number): number } = {
 return M
 ```
 
-```lua
+```typelua
 -- main.tl
 import U from "math_utils"
 print(U.double(21))
@@ -184,7 +184,7 @@ The checker infers the module type from `return M`; annotate the boundary
 
 ## Macros are hygienic
 
-```lua
+```typelua
 macro twice(x) = (x) + (x)
 macro unless(cond, body) do
   if not (cond) then

@@ -4,7 +4,7 @@
 
 ## 类型
 
-```lua
+```typelua
 local a: any = 1
 local u: unknown = "s"
 local n: number = 1.5
@@ -30,7 +30,7 @@ print(a, u, n, i, f, s, b, #arr, m.alice, tup[1], uni, inter, opt)
 
 ## 类型别名、接口、枚举
 
-```lua
+```typelua
 type Point = { x: number, y: number }
 type List<T> = { head: T, tail: List<T> | nil }
 interface Named { name: string, greet(msg: string): string }
@@ -52,7 +52,7 @@ print(p.x, c, e.id, N.C)
 
 ## 函数（两种返回标注都行）
 
-```lua
+```typelua
 local function add(a: number, b: number): number return a + b end
 local function divmod(a: number, b: number): (number, number) return a / b, a % b end
 local function cat(...nums: number[]): string
@@ -69,7 +69,7 @@ print(add(2, 3), q, r, cat(1, 2, 3))
 多返回写成 `-> (A, B)`；只有实参列表最后一个调用可展开。
 泛型自动推断，也可显式指定：
 
-```lua
+```typelua
 local function id<T>(v: T): T return v end
 local function first<T>(xs: T[]): T | nil
   if #xs == 0 then return nil end
@@ -83,7 +83,7 @@ print(first<number>({}))
 
 ## 窄化（写出 nil 安全的 Lua）
 
-```lua
+```typelua
 local function use(x: number | string | nil): string
   if x == nil then
     return "none"
@@ -100,7 +100,7 @@ print(use(41))
 
 真值同样窄化（`if x then` 去掉 `nil`/`false`），成员路径无需临时变量：
 
-```lua
+```typelua
 type Node = { v: number, next: Node | nil }
 local function second(n: Node): number
   if n.next then
@@ -115,7 +115,7 @@ print(second({ v = 1, next = { v = 2, next = nil } }))
 
 ## 类（名义类型、块作用域）
 
-```lua
+```typelua
 abstract class Animal {
   name: string,
   constructor(name: string) self.name = name end,
@@ -139,7 +139,7 @@ print(d:describe(), d:speak())
 
 ## 高级类型（条件 / keyof / 索引 / 映射）
 
-```lua
+```typelua
 type IsString<T> = T extends string ? true : false
 type Head<T> = T extends [infer H, ...unknown[]] ? H : never
 type NameOf<T> = keyof T
@@ -158,7 +158,7 @@ print(a, h, k, px)
 
 ## import 是带类型的 require
 
-```lua
+```typelua
 -- math_utils.tl
 local M: { double(n: number): number } = {
   double = function(n: number): number return n * 2 end,
@@ -166,7 +166,7 @@ local M: { double(n: number): number } = {
 return M
 ```
 
-```lua
+```typelua
 -- main.tl
 import U from "math_utils"
 print(U.double(21))
@@ -178,7 +178,7 @@ print(U.double(21))
 
 ## 宏是卫生的
 
-```lua
+```typelua
 macro twice(x) = (x) + (x)
 macro unless(cond, body) do
   if not (cond) then

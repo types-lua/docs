@@ -14,7 +14,7 @@
 
 ## Minimal program (verified)
 
-```lua
+```typelua
 type Point = { x: number, y: number }
 local function dist(a: Point, b: Point): number
   local dx: number = a.x - b.x

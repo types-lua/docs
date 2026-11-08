@@ -14,8 +14,15 @@ Compiler internals stay in the main repo (`SPEC.md`, `docs/`); this repo is what
 | [`en/`](./docs/en/) | English guides (quickstart → language → CLI → concurrency → FFI → patterns). |
 | [`zh/`](./docs/zh/) | 中文指南（与 `en/` 对齐）。 |
 
-Every ` ```lua ` snippet in this repo passes `tlua check` in a scratch project.
+Every ` ```typelua ` snippet in this repo passes `tlua check` in a scratch project.
 If a snippet needs LuaJIT/`.so` to *run*, it still *checks* clean on 5.4.
+
+Code fences use `typelua`, a custom Shiki grammar
+(`docs/.vitepress/typelua.tm.mjs`) that layers TypeLua's contextual keywords
+(`type`, `interface`, `class`, `async`, `defer`, …) and builtin type names
+(`number`, `string`, `map`, `chan`, …) on top of the Lua grammar. The code
+face is self-hosted JetBrains Mono (`docs/.vitepress/theme/fonts/`, OFL-1.1),
+so nothing depends on Google Fonts at runtime.
 
 ## For humans
 
@@ -37,3 +44,22 @@ If a snippet needs LuaJIT/`.so` to *run*, it still *checks* clean on 5.4.
 python3 scripts/check_snippets.py /tmp/tlua
 # must print ALL SNIPPETS PASS
 ```
+
+## Visual QA (optional, local)
+
+Two Playwright helpers catch layout regressions that a build cannot:
+
+```bash
+npm run docs:dev            # or build and serve dist under /docs/
+export CHROME_BIN=$HOME/.cache/ms-playwright/chromium-*/chrome-linux*/chrome
+
+# screenshot a page (width, dark, dpr, full, selector — all optional)
+node scripts/shot.mjs http://127.0.0.1:5173/en/02-language /tmp/page.png 1440 "" 2
+
+# report horizontal overflow outside scrollable code blocks
+node scripts/audit.mjs http://127.0.0.1:5173/en/02-language 390
+```
+
+`shot.mjs` also fails loudly on console errors, failed requests and HTTP 4xx,
+so a missing font or asset shows up immediately.
+

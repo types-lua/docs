@@ -90,7 +90,7 @@ prelude so `lua dist/main.lua` runs without `LUA_PATH` setup.
 
 A typed dependency boundary looks like this:
 
-```lua
+```typelua
 -- math_utils.tl
 local M: { double(n: number): number } = {
   double = function(n: number): number return n * 2 end,
@@ -98,7 +98,7 @@ local M: { double(n: number): number } = {
 return M
 ```
 
-```lua
+```typelua
 -- main.tl
 import U from "math_utils"
 print(U.double(21))

@@ -2,7 +2,7 @@
 
 ## 给老 Lua 包一层类型边界
 
-```lua
+```typelua
 -- legacy.lua 返回无类型表，保持普通 Lua。
 -- legacy.tl（并排的类型门面）
 local raw = require("legacy") as any
@@ -16,7 +16,7 @@ print(n)
 
 ## 模块模式（推断 + 边缘冻结）
 
-```lua
+```typelua
 -- greet.tl
 local Greet: { hello(name: string): string } = {
   hello = function(name: string): string return "hi " .. name end,
@@ -24,7 +24,7 @@ local Greet: { hello(name: string): string } = {
 return Greet
 ```
 
-```lua
+```typelua
 -- main.tl
 import G from "greet"
 print(G.hello("bo"))

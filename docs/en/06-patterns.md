@@ -2,7 +2,7 @@
 
 ## Wrap legacy Lua with a typed boundary
 
-```lua
+```typelua
 -- legacy.lua returns an untyped table; keep it plain Lua.
 -- legacy.tl (typed facade next to it)
 local raw = require("legacy") as any
@@ -16,7 +16,7 @@ Prefer `as` at one place and export the `Legacy` type; don't sprinkle `any`.
 
 ## Module pattern (inferred, frozen at the edge)
 
-```lua
+```typelua
 -- greet.tl
 local Greet: { hello(name: string): string } = {
   hello = function(name: string): string return "hi " .. name end,
@@ -24,7 +24,7 @@ local Greet: { hello(name: string): string } = {
 return Greet
 ```
 
-```lua
+```typelua
 -- main.tl
 import G from "greet"
 print(G.hello("bo"))

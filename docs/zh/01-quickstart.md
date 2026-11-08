@@ -16,7 +16,7 @@ go build -o tlua ./cmd/tlua
 
 ## 2. 第一个带类型的程序
 
-```lua
+```typelua
 type Point = { x: number, y: number }
 local function dist(a: Point, b: Point): number
   local dx: number = a.x - b.x
@@ -60,7 +60,7 @@ print(dist(p, { x = 4, y = 6 }))
 
 ## 4. 从第一天就写 nil 安全的代码
 
-```lua
+```typelua
 local function greet(name: string | nil): string
   if name == nil then
     return "hello, stranger"
@@ -74,7 +74,7 @@ print(greet("ada"))
 `strictNilChecks` 默认开启：`nil` 不可赋给 `string`。
 用 `==nil`/`~=nil`、`type(x)`、`=="lit"`、真值、成员路径窄化：
 
-```lua
+```typelua
 type Node = { v: number, next: Node | nil }
 local function head(n: Node | nil): number
   if n == nil then

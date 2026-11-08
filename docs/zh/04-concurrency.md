@@ -5,7 +5,7 @@
 
 ## defer / errdefer（LIFO 清理）
 
-```lua
+```typelua
 local function read(name: string): number
   local log: { close(): void } = {
     close = function(): void print("close", name) end,
@@ -27,7 +27,7 @@ print(read(""))
 
 ## 协程（带类型）
 
-```lua
+```typelua
 local co: thread = coroutine.create(function()
   coroutine.yield("step")
 end)
@@ -44,7 +44,7 @@ print(coroutine.status(co))
 
 ## async / await + spawn + chan + select
 
-```lua
+```typelua
 local jobs: chan<integer> = makeChan<integer>(4)
 local done: chan<boolean> = makeChan<boolean>(1)
 
@@ -85,7 +85,7 @@ Agent 最常踩的规则：
   已 close 的通道 `send` 报错；`close` 两次报错。
 - `select` 用大括号 + `case` 守卫 + 可选末位 `default`：
 
-```lua
+```typelua
 local ch: chan<integer> = makeChan<integer>(1)
 await ch:send(9)
 select {

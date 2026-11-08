@@ -1,6 +1,6 @@
 # TypeLua —— 完整参考（ZH，自包含）
 
-> 由 docs/zh/*.md 生成。所有 ```lua 片段均通过 `tlua check`。
+> 由 docs/zh/*.md 生成。所有 ```typelua 片段均通过 `tlua check`。
 
 # TypeLua（中文）
 
@@ -87,7 +87,7 @@ print(dist(p, { x = 4, y = 6 }))
 
 ## 最小程序（已验证）
 
-```lua
+```typelua
 type Point = { x: number, y: number }
 local function dist(a: Point, b: Point): number
   local dx: number = a.x - b.x
@@ -141,7 +141,7 @@ go build -o tlua ./cmd/tlua
 
 ## 2. 第一个带类型的程序
 
-```lua
+```typelua
 type Point = { x: number, y: number }
 local function dist(a: Point, b: Point): number
   local dx: number = a.x - b.x
@@ -185,7 +185,7 @@ print(dist(p, { x = 4, y = 6 }))
 
 ## 4. 从第一天就写 nil 安全的代码
 
-```lua
+```typelua
 local function greet(name: string | nil): string
   if name == nil then
     return "hello, stranger"
@@ -199,7 +199,7 @@ print(greet("ada"))
 `strictNilChecks` 默认开启：`nil` 不可赋给 `string`。
 用 `==nil`/`~=nil`、`type(x)`、`=="lit"`、真值、成员路径窄化：
 
-```lua
+```typelua
 type Node = { v: number, next: Node | nil }
 local function head(n: Node | nil): number
   if n == nil then
@@ -229,7 +229,7 @@ print(head({ v = 7, next = { v = 8, next = nil } }))
 
 ## 类型
 
-```lua
+```typelua
 local a: any = 1
 local u: unknown = "s"
 local n: number = 1.5
@@ -255,7 +255,7 @@ print(a, u, n, i, f, s, b, #arr, m.alice, tup[1], uni, inter, opt)
 
 ## 类型别名、接口、枚举
 
-```lua
+```typelua
 type Point = { x: number, y: number }
 type List<T> = { head: T, tail: List<T> | nil }
 interface Named { name: string, greet(msg: string): string }
@@ -277,7 +277,7 @@ print(p.x, c, e.id, N.C)
 
 ## 函数（两种返回标注都行）
 
-```lua
+```typelua
 local function add(a: number, b: number): number return a + b end
 local function divmod(a: number, b: number): (number, number) return a / b, a % b end
 local function cat(...nums: number[]): string
@@ -294,7 +294,7 @@ print(add(2, 3), q, r, cat(1, 2, 3))
 多返回写成 `-> (A, B)`；只有实参列表最后一个调用可展开。
 泛型自动推断，也可显式指定：
 
-```lua
+```typelua
 local function id<T>(v: T): T return v end
 local function first<T>(xs: T[]): T | nil
   if #xs == 0 then return nil end
@@ -308,7 +308,7 @@ print(first<number>({}))
 
 ## 窄化（写出 nil 安全的 Lua）
 
-```lua
+```typelua
 local function use(x: number | string | nil): string
   if x == nil then
     return "none"
@@ -325,7 +325,7 @@ print(use(41))
 
 真值同样窄化（`if x then` 去掉 `nil`/`false`），成员路径无需临时变量：
 
-```lua
+```typelua
 type Node = { v: number, next: Node | nil }
 local function second(n: Node): number
   if n.next then
@@ -340,7 +340,7 @@ print(second({ v = 1, next = { v = 2, next = nil } }))
 
 ## 类（名义类型、块作用域）
 
-```lua
+```typelua
 abstract class Animal {
   name: string,
   constructor(name: string) self.name = name end,
@@ -364,7 +364,7 @@ print(d:describe(), d:speak())
 
 ## 高级类型（条件 / keyof / 索引 / 映射）
 
-```lua
+```typelua
 type IsString<T> = T extends string ? true : false
 type Head<T> = T extends [infer H, ...unknown[]] ? H : never
 type NameOf<T> = keyof T
@@ -383,7 +383,7 @@ print(a, h, k, px)
 
 ## import 是带类型的 require
 
-```lua
+```typelua
 -- math_utils.tl
 local M: { double(n: number): number } = {
   double = function(n: number): number return n * 2 end,
@@ -391,7 +391,7 @@ local M: { double(n: number): number } = {
 return M
 ```
 
-```lua
+```typelua
 -- main.tl
 import U from "math_utils"
 print(U.double(21))
@@ -403,7 +403,7 @@ print(U.double(21))
 
 ## 宏是卫生的
 
-```lua
+```typelua
 macro twice(x) = (x) + (x)
 macro unless(cond, body) do
   if not (cond) then
@@ -514,7 +514,7 @@ print(v)
 
 类型化依赖边界示例：
 
-```lua
+```typelua
 -- math_utils.tl
 local M: { double(n: number): number } = {
   double = function(n: number): number return n * 2 end,
@@ -522,7 +522,7 @@ local M: { double(n: number): number } = {
 return M
 ```
 
-```lua
+```typelua
 -- main.tl
 import U from "math_utils"
 print(U.double(21))
@@ -562,7 +562,7 @@ print(U.double(21))
 
 ## defer / errdefer（LIFO 清理）
 
-```lua
+```typelua
 local function read(name: string): number
   local log: { close(): void } = {
     close = function(): void print("close", name) end,
@@ -584,7 +584,7 @@ print(read(""))
 
 ## 协程（带类型）
 
-```lua
+```typelua
 local co: thread = coroutine.create(function()
   coroutine.yield("step")
 end)
@@ -601,7 +601,7 @@ print(coroutine.status(co))
 
 ## async / await + spawn + chan + select
 
-```lua
+```typelua
 local jobs: chan<integer> = makeChan<integer>(4)
 local done: chan<boolean> = makeChan<boolean>(1)
 
@@ -642,7 +642,7 @@ Agent 最常踩的规则：
   已 close 的通道 `send` 报错；`close` 两次报错。
 - `select` 用大括号 + `case` 守卫 + 可选末位 `default`：
 
-```lua
+```typelua
 local ch: chan<integer> = makeChan<integer>(1)
 await ch:send(9)
 select {
@@ -672,7 +672,7 @@ FFI 类型，因此以下片段在任何目标下都 `check` 通过。
 
 ## 直接 FFI（显式边界）
 
-```lua
+```typelua
 local ffi = require("ffi")
 ffi.cdef[[
   int add(int a, int b);
@@ -701,19 +701,19 @@ tlua bindgen --header mylib.h --out types/mylib.d.tl --shim mylib.tl --lib MyLib
 
 把三种形态（C 模块 / FFI 直调 / shim 进程）藏进 `require` + `.d.tl`：
 
-```lua
+```typelua
 -- native_shim.lua（HOW，普通 Lua，与 .tl 同目录）
 local M = {}
 function M.native_add(a, b) return a + b end
 return M
 ```
 
-```lua
+```typelua
 -- native.d.tl（WHAT，只检查不发射）
 declare type NativeLib = { native_add(a: number, b: number): number }
 ```
 
-```lua
+```typelua
 -- main.tl（调用方只认 require + as；真实工程里 NativeLib 来自 native.d.tl，
 -- 这里为单文件可验而在本地拼写）
 type NativeLib = { native_add(a: number, b: number): number }
@@ -742,7 +742,7 @@ shim（`cdef` + `ffi.load` + 唯一 `as`，末尾 `return M`）→ 调用方
 
 ## 给老 Lua 包一层类型边界
 
-```lua
+```typelua
 -- legacy.lua 返回无类型表，保持普通 Lua。
 -- legacy.tl（并排的类型门面）
 local raw = require("legacy") as any
@@ -756,7 +756,7 @@ print(n)
 
 ## 模块模式（推断 + 边缘冻结）
 
-```lua
+```typelua
 -- greet.tl
 local Greet: { hello(name: string): string } = {
   hello = function(name: string): string return "hi " .. name end,
@@ -764,7 +764,7 @@ local Greet: { hello(name: string): string } = {
 return Greet
 ```
 
-```lua
+```typelua
 -- main.tl
 import G from "greet"
 print(G.hello("bo"))

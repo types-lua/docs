@@ -5,7 +5,7 @@ explicit markers that erase to plain calls.
 
 ## defer / errdefer (LIFO cleanup)
 
-```lua
+```typelua
 local function read(name: string): number
   local log: { close(): void } = {
     close = function(): void print("close", name) end,
@@ -28,7 +28,7 @@ function leaves via an explicit `error(...)`. Never pass bare `...`
 
 ## Coroutines (typed)
 
-```lua
+```typelua
 local co: thread = coroutine.create(function()
   coroutine.yield("step")
 end)
@@ -45,7 +45,7 @@ only on 5.4 (`TL3203` on 5.1). Literal `status(co) == "dead"` narrows.
 
 ## async / await + spawn + chan + select
 
-```lua
+```typelua
 local jobs: chan<integer> = makeChan<integer>(4)
 local done: chan<boolean> = makeChan<boolean>(1)
 
@@ -88,7 +88,7 @@ Rules agents trip on:
   `send` on a closed channel errors; `close` twice errors.
 - `select` uses braces with `case` guards and optional trailing `default`:
 
-```lua
+```typelua
 local ch: chan<integer> = makeChan<integer>(1)
 await ch:send(9)
 select {

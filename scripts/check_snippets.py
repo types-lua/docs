@@ -11,7 +11,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-BLOCK = re.compile(r"```(lua|tl|typelua)\s*\n(.*?)```", re.S)
+BLOCK = re.compile(r"```(typelua|tl|lua)\s*\n(.*?)```", re.S)
 
 def docs_root() -> Path:
     for a in sys.argv[2:]:

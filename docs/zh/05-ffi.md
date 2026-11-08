@@ -5,7 +5,7 @@ FFI 类型，因此以下片段在任何目标下都 `check` 通过。
 
 ## 直接 FFI（显式边界）
 
-```lua
+```typelua
 local ffi = require("ffi")
 ffi.cdef[[
   int add(int a, int b);
@@ -34,19 +34,19 @@ tlua bindgen --header mylib.h --out types/mylib.d.tl --shim mylib.tl --lib MyLib
 
 把三种形态（C 模块 / FFI 直调 / shim 进程）藏进 `require` + `.d.tl`：
 
-```lua
+```typelua
 -- native_shim.lua（HOW，普通 Lua，与 .tl 同目录）
 local M = {}
 function M.native_add(a, b) return a + b end
 return M
 ```
 
-```lua
+```typelua
 -- native.d.tl（WHAT，只检查不发射）
 declare type NativeLib = { native_add(a: number, b: number): number }
 ```
 
-```lua
+```typelua
 -- main.tl（调用方只认 require + as；真实工程里 NativeLib 来自 native.d.tl，
 -- 这里为单文件可验而在本地拼写）
 type NativeLib = { native_add(a: number, b: number): number }
