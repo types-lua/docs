@@ -50,6 +50,11 @@ jobs:
         run: python3 scripts/check_snippets.py /tmp/tlua
       - name: Install dependencies
         run: npm ci
+      - name: Configure Pages
+        # Fails early with a clear message when Pages is not enabled
+        # (Settings -> Pages -> Source: GitHub Actions). Auto-enable needs a
+        # PAT; the default token cannot turn Pages on.
+        uses: actions/configure-pages@v5
       - name: Build with VitePress
         run: npm run docs:build
       - name: Upload artifact
