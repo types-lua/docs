@@ -26,7 +26,7 @@ so nothing depends on Google Fonts at runtime.
 
 ## For humans
 
-- English: `en/index.md` → `en/01-quickstart.md` → `en/02-language.md` → `en/03-cli.md` → `en/04-concurrency.md` → `en/05-ffi.md` → `en/06-patterns.md`
+- English: `en/index.md` → `en/01-quickstart.md` → `en/02-language.md` → `en/03-cli.md` → `en/04-concurrency.md` → `en/05-ffi.md` → `en/06-patterns.md` → `en/07-testing.md`
 - 中文：`zh/index.md` → `zh/01-quickstart.md` → …（同构）
 
 ## Live site (GitHub Pages)

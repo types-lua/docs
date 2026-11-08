@@ -11,6 +11,7 @@
 5. `zh/04-concurrency.md` —— `defer`、协程、`async`/`await`/`spawn`/`chan`/`select`
 6. `zh/05-ffi.md` —— FFI、`bindgen`、跨语言 shim、`.d.tl`、包管理
 7. `zh/06-patterns.md` —— Agent 实战模式 + 排错表
+8. `zh/07-testing.md` —— `tlua test`、断言、CI
 
 ## 最小程序（已验证）
 

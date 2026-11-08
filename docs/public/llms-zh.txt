@@ -17,6 +17,24 @@
 - [并发](https://types-lua.github.io/docs/zh/04-concurrency)：defer、协程、async/spawn/chan/select
 - [FFI 与原生](https://types-lua.github.io/docs/zh/05-ffi)：ffi、bindgen、shim、.d.tl、资产透传
 - [模式与排错](https://types-lua.github.io/docs/zh/06-patterns)：实战模式 + TL 排错表
+- [测试](https://types-lua.github.io/docs/zh/07-testing)：`tlua test`、断言、CI
+
+## 测试（零配置）
+
+```
+tlua test
+tlua test --filter 名字 --format=json
+tlua test --lua luajit --target 5.1
+```
+
+测试文件返回命名用例表：
+
+```lua
+import T from "tlua_test"
+return {
+  ["adds"] = function(): void T.eq(1 + 1, 2) end,
+}
+```
 
 ## 快速开始
 

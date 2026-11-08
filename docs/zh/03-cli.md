@@ -104,6 +104,17 @@ import U from "math_utils"
 print(U.double(21))
 ```
 
+## 测试
+
+`tlua test` 自动发现 `tests/**`、先做全量类型检查、注入 `tlua_test` 断言模块，
+再逐个用例运行（详见 [测试](./07-testing)）。
+
+```bash
+tlua test
+tlua test --filter store --format=json
+tlua test --lua lua5.4
+```
+
 ## LSP（stdio）
 
 ```bash

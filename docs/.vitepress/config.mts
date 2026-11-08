@@ -15,6 +15,7 @@ const enSidebar = [
   { text: 'Concurrency', link: '/en/04-concurrency' },
   { text: 'FFI & Native', link: '/en/05-ffi' },
   { text: 'Patterns & Fixes', link: '/en/06-patterns' },
+  { text: 'Testing', link: '/en/07-testing' },
 ]
 
 const zhSidebar = [
@@ -25,6 +26,7 @@ const zhSidebar = [
   { text: '并发', link: '/zh/04-concurrency' },
   { text: 'FFI 与原生', link: '/zh/05-ffi' },
   { text: '模式与排错', link: '/zh/06-patterns' },
+  { text: '测试', link: '/zh/07-testing' },
 ]
 
 export default defineConfig({

@@ -104,6 +104,17 @@ import U from "math_utils"
 print(U.double(21))
 ```
 
+## Testing
+
+`tlua test` discovers `tests/**`, type-checks the project, injects the
+`tlua_test` helper and runs every named case (see [Testing](./07-testing)).
+
+```bash
+tlua test
+tlua test --filter store --format=json
+tlua test --lua lua5.4
+```
+
 ## LSP (stdio)
 
 ```bash

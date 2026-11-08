@@ -17,6 +17,7 @@
 - [Concurrency](https://types-lua.github.io/docs/en/04-concurrency): defer, coroutines, async/spawn/chan/select
 - [FFI & Native](https://types-lua.github.io/docs/en/05-ffi): ffi, bindgen, shims, .d.tl, assets
 - [Patterns & Fixes](https://types-lua.github.io/docs/en/06-patterns): recipes + TL error-fix table
+- [Testing](https://types-lua.github.io/docs/en/07-testing): `tlua test`, assertions, CI recipe
 
 ## Quickstart
 
@@ -37,6 +38,23 @@ local function dist(a: Point, b: Point): number
 end
 local p: Point = { x = 1, y = 2 }
 print(dist(p, { x = 4, y = 6 }))
+```
+
+## Testing (zero config)
+
+```
+tlua test
+tlua test --filter NAME --format=json
+tlua test --lua luajit --target 5.1
+```
+
+A test file returns named cases and imports the injected helper:
+
+```lua
+import T from "tlua_test"
+return {
+  ["adds"] = function(): void T.eq(1 + 1, 2) end,
+}
 ```
 
 ## Rules
