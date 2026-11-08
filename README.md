@@ -61,5 +61,10 @@ node scripts/audit.mjs http://127.0.0.1:5173/en/02-language 390
 ```
 
 `shot.mjs` also fails loudly on console errors, failed requests and HTTP 4xx,
-so a missing font or asset shows up immediately.
+so a missing font or asset shows up immediately. `fontcheck.mjs` asserts the
+computed font stack and that the self-hosted faces actually loaded:
+
+```bash
+node scripts/fontcheck.mjs https://types-lua.github.io/docs/en/02-language
+```
 
