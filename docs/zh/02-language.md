@@ -176,6 +176,41 @@ print(U.double(21))
 `require(...) as T` 冻结边界，不一致报 `TL3010`。缺失/循环/自引用一律退化为
 `any`，绝不崩溃。
 
+
+## 相对导入（包内）
+
+多文件库不用再手写 `package.path`：以 `./` 或 `../` 开头的路径按**引用文件
+所在目录**解析（先 `x.tl`，再 `x/init.tl`）。
+
+```typelua
+-- FILE: lib/codec.tl
+local M: { add(a: number, b: number): number } = {
+  add = function(a: number, b: number): number return a + b end,
+}
+return M
+
+-- FILE: lib/init.tl
+import codec from "./codec"
+local M: { add(a: number, b: number): number } = { add = codec.add }
+return M
+
+-- FILE: main.tl
+import L from "./lib"
+print(L.add(1, 2))
+```
+
+发射时改写为稳定模块名：仓内相对工程根（`lib.codec`），vendored 包相对
+`tlua_modules/` 根（`example.com.pkg.codec`）。目录导入会把 `pkg/init.tl`
+规范化为 `pkg`，与别处 `require("pkg")` 共享同一模块实例。
+
+规则与诊断：
+
+- 目标必须是工程根内的普通 `.tl`（不能是 `.d.tl`）。
+- 目标缺失、越出工程根、指向 `.d.tl`、模块名冲突（`a.b.tl` 与 `a/b.tl`）
+  均报 `TL4002`。
+- `require("./x")` 没有相对语义，同样报 `TL4002`，请改用
+  `import Name from "./x"`。
+
 ## 宏是卫生的
 
 ```typelua

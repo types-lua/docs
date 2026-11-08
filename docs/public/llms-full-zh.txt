@@ -76,7 +76,8 @@ tlua example basic -- a   # 透传参数运行
 - 合法 Lua 5.4 即合法 TypeLua；`type`/`class`/`import`/`defer`/`await`/`spawn`/`select`/`async`/`macro` 均为上下文关键字。
 - `strictNilChecks` 默认开：用 `==nil`/`~=nil`、`type(x)==`、`=="lit"`、真值、成员路径窄化。
 - `interface` 结构兼容，类实例名义兼容；`super(...)` 只在派生构造器且在 `self` 之前。
-- `import N from "p"` 是带类型推断的 `require` 糖；`require("ffi")` 仅在 `require` 未被遮蔽时有精确类型。
+- `import N from "p"` 是带类型推断的 `require` 糖；`import N from "./x"` 是包内相对导入，发射为稳定模块名（`lib.codec`、`example.com.pkg.codec`）；`require("./x")` 报 `TL4002`。
+- `require("ffi")` 仅在 `require` 未被遮蔽时有精确类型。
 - `defer f()` 只接受调用，函数退出 LIFO 运行；`errdefer` 仅在同一函数显式 `error()` 时触发。
 - 并发是单线程 CSP：`await`/`select` 在 `async` 外报错（`TL3801`/`TL3802`）；同步调用阻塞原语报 `TL3805`。
 - FFI/`.so` 需 `--target 5.1` + `--lua luajit`；`ffi.cdef` 不透明，手写 `as CLib`；`.d.tl` 只检查不发射。
@@ -430,6 +431,41 @@ print(U.double(21))
 检查器从 `return M` 推断模块类型；用 `import U: T from "p"` 或
 `require(...) as T` 冻结边界，不一致报 `TL3010`。缺失/循环/自引用一律退化为
 `any`，绝不崩溃。
+
+
+## 相对导入（包内）
+
+多文件库不用再手写 `package.path`：以 `./` 或 `../` 开头的路径按**引用文件
+所在目录**解析（先 `x.tl`，再 `x/init.tl`）。
+
+```typelua
+-- FILE: lib/codec.tl
+local M: { add(a: number, b: number): number } = {
+  add = function(a: number, b: number): number return a + b end,
+}
+return M
+
+-- FILE: lib/init.tl
+import codec from "./codec"
+local M: { add(a: number, b: number): number } = { add = codec.add }
+return M
+
+-- FILE: main.tl
+import L from "./lib"
+print(L.add(1, 2))
+```
+
+发射时改写为稳定模块名：仓内相对工程根（`lib.codec`），vendored 包相对
+`tlua_modules/` 根（`example.com.pkg.codec`）。目录导入会把 `pkg/init.tl`
+规范化为 `pkg`，与别处 `require("pkg")` 共享同一模块实例。
+
+规则与诊断：
+
+- 目标必须是工程根内的普通 `.tl`（不能是 `.d.tl`）。
+- 目标缺失、越出工程根、指向 `.d.tl`、模块名冲突（`a.b.tl` 与 `a/b.tl`）
+  均报 `TL4002`。
+- `require("./x")` 没有相对语义，同样报 `TL4002`，请改用
+  `import Name from "./x"`。
 
 ## 宏是卫生的
 

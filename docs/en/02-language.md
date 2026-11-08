@@ -182,6 +182,43 @@ The checker infers the module type from `return M`; annotate the boundary
 (`import U: T from "p"` or `require(...) as T`) to freeze it. Mismatches are
 `TL3010`. Missing/circular/self imports degrade to `any`, never to a crash.
 
+
+## Relative imports (package-local)
+
+Multi-file libraries can import siblings without touching `package.path`:
+a path starting with `./` or `../` resolves against the **requiring file**
+(`x.tl`, then `x/init.tl`).
+
+```typelua
+-- FILE: lib/codec.tl
+local M: { add(a: number, b: number): number } = {
+  add = function(a: number, b: number): number return a + b end,
+}
+return M
+
+-- FILE: lib/init.tl
+import codec from "./codec"
+local M: { add(a: number, b: number): number } = { add = codec.add }
+return M
+
+-- FILE: main.tl
+import L from "./lib"
+print(L.add(1, 2))
+```
+
+The emitter rewrites the import to a stable module name: relative to the
+project root (`lib.codec`) or, for vendored packages, to `tlua_modules/`
+(`example.com.pkg.codec`). A directory import canonicalizes `pkg/init.tl` to
+`pkg`, so `require("pkg")` elsewhere addresses the same module instance.
+
+Rules and diagnostics:
+
+- Targets must be non-declaration `.tl` files inside the project root.
+- Missing targets, paths escaping the root, `.d.tl` targets and module-name
+  collisions (`a.b.tl` vs `a/b.tl`) are `TL4002`.
+- `require("./x")` has no relative semantics and is rejected with the same
+  code; use `import Name from "./x"` instead.
+
 ## Macros are hygienic
 
 ```typelua
