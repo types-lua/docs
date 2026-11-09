@@ -645,8 +645,9 @@ tlua test --list --format=json
 
 增量同步（`textDocumentSync: 2`）、悬停、跳转、`.`/`:` 补全（含成员）、
 引用、重命名、文档符号。诊断经 `textDocument/publishDiagnostics` 推送
-`{range, severity, code, source: "tlua", message}`。单文件模式无 ambient，
-多文件工程以 `tlua check` 为准。
+`{range, severity, code, source: "tlua", message}`。诊断会从最近的
+`tlua.json`（`typeRoots`）加载 ambient `.d.tl`；跨文件 `import` 类型仍按
+单文件处理，工程级推断以 `tlua check` 为准。
 
 ## sourceMap 与 treeShake
 

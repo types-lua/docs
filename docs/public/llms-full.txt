@@ -654,8 +654,9 @@ tlua test --list --format=json
 Incremental sync (`textDocumentSync: 2`), hover, definition, completion on
 `.`/`:` (members included), references, rename, document symbols. Diagnostics
 push as `textDocument/publishDiagnostics` with `{range, severity, code,
-source: "tlua", message}`. Single-file mode has no ambient context — for
-multi-file projects, trust `tlua check`, not single-file hover.
+source: "tlua", message}`. Diagnostics load ambient `.d.tl` declarations
+from the nearest `tlua.json` (`typeRoots`). Cross-file import types are still
+single-file, so `tlua check` is authoritative for project-wide inference.
 
 ## sourceMap and treeShake
 
