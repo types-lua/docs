@@ -655,8 +655,10 @@ Incremental sync (`textDocumentSync: 2`), hover, definition, completion on
 `.`/`:` (members included), references, rename, document symbols. Diagnostics
 push as `textDocument/publishDiagnostics` with `{range, severity, code,
 source: "tlua", message}`. Diagnostics load ambient `.d.tl` declarations
-from the nearest `tlua.json` (`typeRoots`). Cross-file import types are still
-single-file, so `tlua check` is authoritative for project-wide inference.
+from the nearest `tlua.json` (`typeRoots`). Go-to-definition follows ambient
+declarations into their `.d.tl` file and references label the real files;
+cross-file rename is refused because imports are still single-file. Use
+`tlua check` for project-wide inference.
 
 ## sourceMap and treeShake
 
